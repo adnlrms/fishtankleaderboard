@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Class Aquarium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --panel:rgba(5,28,54,.84);
+  --panel2:rgba(255,255,255,.07);
+  --line:rgba(160,215,255,.18);
+  --text:#ecf7ff;
+  --muted:#93bfdf;
+  --gold:#ffd34d;
+  --good:#4fe0c0;
+  --warn:#ffb35c;
+  --bad:#ff6b6b;
+  --sick:#b6e07a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#021428;color:var(--text);font-family:'Fredoka',system-ui,-apple-system,'Segoe UI',sans-serif;overflow:hidden}
+#app{display:flex;height:100vh;width:100vw}
+#tankWrap{position:relative;flex:1;min-width:0;overflow:hidden}
+#tank{display:block;width:100%;height:100%}
+#topbar{position:absolute;top:14px;left:16px;right:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;pointer-events:none;z-index:2}
+#topbar>*{pointer-events:auto}
+#title{font-size:clamp(22px,2.4vw,38px);font-weight:700;letter-spacing:.3px;margin-right:auto;text-shadow:0 3px 12px rgba(0,0,0,.55);pointer-events:none;line-height:1.1}
+#title small{display:block;font-size:.42em;font-weight:500;color:var(--muted);letter-spacing:0;margin-top:2px}
+.pill{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:15px;backdrop-filter:blur(8px)}
+button{font:inherit;font-size:15px;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;backdrop-filter:blur(8px);transition:background .15s,border-color .15s}
+button:hover{background:rgba(25,75,125,.92)}
+button.on{border-color:var(--gold);color:var(--gold)}
+button.primary{background:var(--gold);color:#3a2a00;border-color:var(--gold);font-weight:600}
+button.primary:hover{background:#ffe07a}
+button:disabled{opacity:.5;cursor:default}
+select,input[type=text],input[type=password],input[type=number],textarea{font:inherit;color:var(--text);background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:10px;padding:7px 10px;outline:none}
+select:focus,input:focus,textarea:focus{border-color:var(--gold)}
+select option{background:#06264a}
+#sectionSel{border:none;background:transparent;padding:0 4px;font-size:15px;max-width:220px}
+input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:pointer}
+#examLabel{min-width:96px;font-weight:600;white-space:nowrap}
+#bottombar{position:absolute;left:16px;right:16px;bottom:14px;z-index:2;display:flex;gap:10px;flex-wrap:wrap;pointer-events:none}
+#bottombar .pill{font-size:14px}
+.bar{width:120px;height:8px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--good),var(--gold));border-radius:99px;transition:width .6s}
+#side{width:340px;flex:none;background:linear-gradient(180deg,#06264a,#041a33);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+#side.hidden{display:none}
+.view{display:flex;flex-direction:column;flex:1;min-height:0}
+.view.hidden{display:none}
+#side h2{margin:0;padding:18px 18px 4px;font-size:22px}
+#side .sub{padding:0 18px 12px;color:var(--muted);font-size:13px;line-height:1.4}
+#board,#feedList{flex:1;overflow-y:auto;padding:6px 8px 10px;border-top:1px solid var(--line)}
+#board::-webkit-scrollbar,#feedList::-webkit-scrollbar{width:8px}
+#board::-webkit-scrollbar-thumb,#feedList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:8px}
+.row{display:grid;grid-template-columns:34px 14px 1fr auto;align-items:center;gap:8px;padding:5px 10px;border-radius:10px;cursor:pointer;font-size:15px}
+.row:hover,.row.hl{background:rgba(255,255,255,.09)}
+.rank{font-weight:700;color:var(--muted);text-align:center}
+.dot{width:14px;height:14px;border-radius:50%;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2)}
+.nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nm small{color:var(--muted);font-size:12px;margin-left:3px}
+.sc{font-weight:600;font-variant-numeric:tabular-nums}
+.row.sick .nm{color:var(--sick)}
+#legend{border-top:1px solid var(--line);padding:10px 16px 14px;font-size:12.5px;color:var(--muted);line-height:1.65}
+/* feeding panel */
+.feedTop{display:flex;gap:8px;padding:0 14px 10px}
+.feedTop select{flex:1;min-width:0}
+#feedCount{padding:0 18px 8px;font-size:13px;color:var(--gold)}
+.frow{display:grid;grid-template-columns:22px 1fr 66px 40px 20px;align-items:center;gap:6px;padding:4px 8px;border-radius:10px;font-size:15px}
+.frow.hl{background:rgba(255,211,77,.12)}
+.frow .num{color:var(--muted);font-size:12px;text-align:right}
+.frow input{width:66px;padding:5px 8px;text-align:center;font-weight:600}
+.frow input.err{border-color:var(--bad)}
+.frow .mx{color:var(--muted);font-size:12px}
+.frow .st{font-size:14px;text-align:center}
+.feedFoot{display:flex;gap:6px;flex-wrap:wrap;padding:10px 12px 14px;border-top:1px solid var(--line)}
+.feedFoot button{font-size:14px;padding:6px 11px}
+.empty{padding:18px;color:var(--muted);text-align:center;line-height:1.5}
+/* card */
+#card{position:absolute;z-index:5;top:50%;left:50%;transform:translate(-50%,-50%);width:min(460px,calc(100% - 32px));max-height:calc(100% - 32px);overflow:auto;background:linear-gradient(180deg,rgba(8,44,82,.97),rgba(4,26,51,.97));border:1px solid var(--line);border-radius:20px;padding:18px 20px 16px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+#card.hidden{display:none}
+.close{position:absolute;top:10px;right:10px;width:34px;height:34px;padding:0;border-radius:50%;font-size:18px}
+.cardHead{display:flex;gap:14px;align-items:center;padding-right:30px}
+#cardFish{width:130px;height:86px;flex:none;background:radial-gradient(circle,rgba(80,170,255,.28),transparent 70%);border-radius:14px}
+#cardName{font-size:24px;font-weight:700;margin:0;line-height:1.15}
+.muted{color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 10px}
+.stat{background:var(--panel2);border-radius:12px;padding:8px 4px;text-align:center}
+.stat b{display:block;font-size:20px}
+.stat span{font-size:12px;color:var(--muted)}
+.status{background:var(--panel2);border-radius:12px;padding:9px 12px;margin:6px 0;font-size:14.5px;line-height:1.4}
+.prog{margin:10px 0 4px;font-size:13.5px;color:var(--muted)}
+.prog .bar{width:100%;height:10px;margin-top:6px}
+#chart{width:100%;height:auto;margin-top:8px;display:block}
+/* modal */
+#modal{position:fixed;inset:0;background:rgba(0,10,25,.6);z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
+#modal.hidden{display:none}
+.mbox{position:relative;width:min(480px,100%);max-height:calc(100vh - 32px);overflow:auto;background:linear-gradient(180deg,#0a3260,#05203f);border:1px solid var(--line);border-radius:20px;padding:20px 22px;box-shadow:0 24px 70px rgba(0,0,0,.55)}
+.mbox h3{margin:0 40px 6px 0;font-size:22px}
+.mbox p{color:var(--muted);line-height:1.45;margin:6px 0 12px;font-size:14.5px}
+.mbox label{display:block;font-size:13.5px;color:var(--muted);margin:12px 0 5px}
+.mbox input[type=text],.mbox input[type=password],.mbox input[type=number],.mbox textarea{width:100%}
+.mbox .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.mbox .err{color:var(--bad);font-size:14px;min-height:18px;margin-top:8px}
+.slist{max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:12px;padding:4px}
+.srow{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;font-size:14.5px}
+.srow:hover{background:rgba(255,255,255,.06)}
+.srow span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srow button{font-size:13px;padding:3px 10px}
+.srow button.danger{border-color:var(--bad);color:var(--bad)}
+.check{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:14.5px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+#toast{position:absolute;left:50%;top:80px;transform:translateX(-50%);background:var(--panel);border:1px solid var(--gold);color:var(--gold);padding:8px 16px;border-radius:999px;z-index:6;opacity:0;transition:opacity .3s;pointer-events:none;font-size:15px;max-width:90%;text-align:center}
+#toast.show{opacity:1}
+#msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:4;pointer-events:none}
+#msg div{background:var(--panel);border:1px solid var(--line);padding:16px 22px;border-radius:16px;font-size:18px;max-width:80%;text-align:center}
+#msg.hidden{display:none}
+@media (max-width:900px){#side{width:280px}.row{font-size:14px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="tankWrap">
+    <canvas id="tank"></canvas>
+    <div id="topbar">
+      <div id="title">Class Aquarium<small>Loading…</small></div>
+      <div class="pill" id="sectionCtl" title="Switch section"><span>🏫</span><select id="sectionSel"></select></div>
+      <div class="pill" id="examCtl" title="Slide to see the tank after each exam">
+        <span>📅</span>
+        <input type="range" id="exam" min="-1" max="0" step="1" value="0">
+        <span id="examLabel">—</span>
+      </div>
+      <button id="play" title="Watch the class grow exam by exam">▶ Replay</button>
+      <button id="labels" class="on" title="Show/hide names (L)">🏷️ Names</button>
+      <button id="boardBtn" class="on" title="Show/hide the side panel (B)">🏆 Board</button>
+      <button id="fs" title="Full screen (F)">⛶</button>
+      <button id="teachBtn" title="Teacher mode: feed the fish (enter scores)">🔒 Teacher</button>
+    </div>
+    <div id="bottombar">
+      <div class="pill" id="avgPill">Class average —</div>
+      <div class="pill" id="unlockPill">—</div>
+      <div class="pill" id="updated" style="margin-left:auto">—</div>
+    </div>
+    <div id="card" class="hidden">
+      <button class="close" id="cardClose" aria-label="Close">×</button>
+      <div class="cardHead">
+        <canvas id="cardFish" width="260" height="172"></canvas>
+        <div><h2 id="cardName"></h2><div id="cardSub" class="muted"></div></div>
+      </div>
+      <div class="stats" id="cardStats"></div>
+      <div id="cardStatus"></div>
+      <div class="prog" id="cardProg"></div>
+      <svg id="chart" viewBox="0 0 420 160"></svg>
+    </div>
+    <div id="toast"></div>
+    <div id="msg" class="hidden"><div></div></div>
+  </div>
+  <aside id="side">
+    <div class="view" id="boardView">
+      <h2>🏆 Leaderboard</h2>
+      <div class="sub" id="sideSub">Ranked by total score</div>
+      <div id="board"></div>
+      <div id="legend">
+        👑 Top of the class &nbsp; ✨ Most improved<br>
+        🤒 Sick (scored 0 on the latest exam)<br>
+        🩹 Scar (heals with a passing score)<br>
+        Fry → Juvenile → Adult → Legend
+      </div>
+    </div>
+    <div class="view hidden" id="feedView">
+      <h2>🍤 Feeding time</h2>
+      <div class="sub">Type a score and press <b>Enter</b>. The fish swims up to eat it and the next student is ready. Leave it empty if absent.</div>
+      <div class="feedTop"><select id="feedExam"></select><button id="newExamBtn">➕ New exam</button></div>
+      <div id="feedCount"></div>
+      <div id="feedList"></div>
+      <div class="feedFoot">
+        <button id="stuBtn">👥 Students</button>
+        <button id="secBtn">🏫 Sections</button>
+        <button id="setBtn">⚙️ Settings</button>
+      </div>
+    </div>
+  </aside>
+</div>
+<div id="modal" class="hidden"><div class="mbox"><button class="close" id="modalClose" aria-label="Close">×</button><div id="mbody"></div></div></div>
+
+<script>
+/* ================================================================
+   🔗 PASTE YOUR APPS SCRIPT LINK HERE (the one that ends in /exec)
+   Find it in Apps Script: Deploy → Manage deployments,
+   or in the sheet: 🐠 Aquarium → Show the aquarium link.
+   Leave it empty to see the demo.
+   ================================================================ */
+var API_URL = '';
+</script>
+<script>
+(function(){
+'use strict';
+
+var DEFAULTS = { className:'Class Aquarium', expectedExams:10, passingPercent:75, refreshSeconds:60, showFishNames:false };
+var STAGES = [ {name:'Fry',at:0}, {name:'Juvenile',at:.15}, {name:'Adult',at:.40}, {name:'Legend',at:.70} ];
+var DECOR = [
+  {at:50, name:'Coral reef',     icon:'🪸', key:'coral'},
+  {at:65, name:'Seashells',      icon:'🐚', key:'shells'},
+  {at:75, name:'Treasure chest', icon:'💰', key:'chest'},
+  {at:85, name:'Submarine',      icon:'⚓', key:'sub'}
+];
+
+/* Three ways to run:
+   gas    – served by Google Apps Script itself (google.script.run is available)
+   remote – hosted anywhere else (e.g. GitHub Pages), talking to API_URL
+   demo   – no link set: built-in sample classes, nothing is saved           */
+var QP = new URLSearchParams(location.search);
+var gas = !!(window.google && google.script && google.script.run);
+var apiUrl = String(QP.get('api') || window.API_URL || '').trim();
+var remote = !gas && /^https:\/\/script\.google(usercontent)?\.com\//.test(apiUrl);
+var live = gas || remote;
+var setupProblem = '';
+if (!gas && apiUrl && !remote) setupProblem = 'API_URL does not look like an Apps Script link. It should start with https://script.google.com/';
+else if (remote && /\/dev(\?|$)/.test(apiUrl)) setupProblem = 'API_URL is a "/dev" test link, which only works for you. Use the link that ends in /exec.';
+var DATA = null, CFG = Object.assign({}, DEFAULTS), currentSection = '';
+var viewExam = -1, followLatest = true, showLabels = true;
+var models = [], sortedModels = [], fishes = new Map(), classAvg = null, unlocked = new Set();
+var hoverKey = null, cardKey = null, playTimer = null;
+var teacher = { on:false, pin:null }, feedExam = -1, lastAct = Date.now();
+
+function $(id){ return document.getElementById(id); }
+function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+function rnd(a,b){ return a + Math.random()*(b-a); }
+function hash(s){ var h=2166136261; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return h>>>0; }
+function esc(s){ return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function fmt(n){ return Math.round(n*10)/10; }
+/* Short label for the tank ("Dela Cruz, Juan Miguel" -> "Juan D."). Full names stay on the board and cards. */
+function nameOf(m){
+  if (CFG.showFishNames && m.nick) return m.nick;
+  var n = m.name.trim(), parts;
+  if (n.indexOf(',') > 0){
+    var sur = n.slice(0, n.indexOf(',')).trim(), first = n.slice(n.indexOf(',') + 1).trim().split(/\s+/)[0] || '';
+    return first ? first + ' ' + sur.charAt(0) + '.' : sur;
+  }
+  if (n.length <= 16) return n;
+  parts = n.split(/\s+/);
+  return parts.length > 1 ? parts[0] + ' ' + parts[parts.length-1].charAt(0) + '.' : n.slice(0, 15) + '…';
+}
+function errText(e){
+  var m = (e && e.message) || String(e || 'Something went wrong.');
+  return m.replace(/^(?:\s*\w*(?:Error|Exception):\s*)+/, '').replace(/^(NO_PIN|WRONG_PIN):\s*/, '');
+}
+function isAuthErr(e){ return /WRONG_PIN|NO_PIN/.test((e && e.message) || String(e)); }
+
+/* ---------- backend calls (Google Apps Script, or a local demo) ---------- */
+function api(fn){
+  var args = Array.prototype.slice.call(arguments, 1);
+  if (remote) return fetchApi(fn, args, fn === 'getData' ? 1 : 0);
+  return new Promise(function(res, rej){
+    if (gas){
+      var r = google.script.run.withSuccessHandler(res).withFailureHandler(rej);
+      r[fn].apply(r, args);
+    } else {
+      setTimeout(function(){
+        try { res(JSON.parse(JSON.stringify(MOCK[fn].apply(null, args)))); } catch(e){ rej(e); }
+      }, 220);
+    }
+  });
+}
+
+/* Calls the Apps Script web app over HTTPS. Text/plain POST avoids a CORS
+   pre-flight, which Apps Script cannot answer. Read requests retry once. */
+var ACCESS_HINT = 'In Apps Script, open Deploy → Manage deployments and check that "Who has access" is set to "Anyone", and that API_URL is the link ending in /exec.';
+function fetchApi(fn, args, retries){
+  var ctrl = window.AbortController ? new AbortController() : null;
+  var timer = setTimeout(function(){ if (ctrl) ctrl.abort(); }, 45000);
+  return fetch(apiUrl, {
+    method:'POST', redirect:'follow', cache:'no-store',
+    headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+    body: JSON.stringify({ fn:fn, args:args }),
+    signal: ctrl ? ctrl.signal : undefined
+  }).then(function(r){
+    return r.text();
+  }, function(err){
+    clearTimeout(timer);
+    if (retries > 0) return 'RETRY';
+    throw new Error(err && err.name === 'AbortError'
+      ? 'The sheet took too long to answer. Please try again.'
+      : 'Could not reach your Apps Script link. Check the internet connection. ' + ACCESS_HINT);
+  }).then(function(txt){
+    clearTimeout(timer);
+    if (txt === 'RETRY') return new Promise(function(r){ setTimeout(r, 1500); }).then(function(){ return fetchApi(fn, args, retries - 1); });
+    var j;
+    try { j = JSON.parse(txt); } catch (e){ throw new Error('Your Apps Script link answered with a web page instead of data. ' + ACCESS_HINT); }
+    if (!j || typeof j.ok !== 'boolean') throw new Error('Unexpected answer from the Apps Script link. Is Code.gs up to date?');
+    if (!j.ok) throw new Error(j.error || 'Something went wrong.');
+    return j.result;
+  });
+}
+
+/* ---------- data ---------- */
+var loadSeq = 0;
+function load(){
+  var my = ++loadSeq;
+  return api('getData', currentSection).then(function(d){
+    if (my === loadSeq) onData(d);     // ignore answers that arrive after a newer request
+  }).catch(function(e){
+    if (my !== loadSeq) return;
+    if (DATA) toast('⚠ Could not refresh: ' + errText(e) + ' Will try again soon.');
+    else showMsg('Could not read the sheet: ' + errText(e) + ' Please reload the page.');
+  });
+}
+
+function onData(d){
+  if (!d || !Array.isArray(d.students) || !Array.isArray(d.exams)) { toast('⚠ The sheet returned unexpected data.'); return; }
+  loadSeq++;   // any older getData still in flight is now stale
+  d.sections = Array.isArray(d.sections) && d.sections.length ? d.sections : [d.section || 'Class'];
+  d.max = d.exams.map(function(_, i){ var m = d.max && Number(d.max[i]); return m > 0 ? m : 100; });
+  d.students.forEach(function(s){
+    s.name = String(s.name); s.nick = s.nick ? String(s.nick) : '';
+    s.scores = d.exams.map(function(_, i){ var v = s.scores && s.scores[i]; return (v === null || v === undefined || v === '' || !isFinite(Number(v))) ? null : Number(v); });
+  });
+  hideMsg();
+  var sectionChanged = DATA && DATA.section !== d.section;
+  if (sectionChanged){ flushFoods(); fishes.clear(); closeCard(); }
+  DATA = d;
+  currentSection = d.section;
+  CFG = Object.assign({}, DEFAULTS, d.settings || {});
+  document.title = CFG.className + ' – ' + d.section;
+  $('title').innerHTML = esc(CFG.className) + '<small>' + (live ? '' : 'Demo (no API_URL set) · ') + esc(d.section) + ' · ' + d.students.length + ' fish in the tank</small>';
+  var sel = $('sectionSel');
+  sel.innerHTML = d.sections.map(function(s){ return '<option' + (s === d.section ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('');
+  $('sectionCtl').style.display = (d.sections.length > 1 || teacher.on) ? '' : 'none';
+  updateLast();
+  if (followLatest || viewExam > DATA.lastExam || sectionChanged) viewExam = DATA.lastExam;
+  syncExamControls();
+  $('updated').textContent = (live ? 'Updated ' : 'Demo · ') + new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  if (!d.students.length) showMsg(teacher.on ? 'This tank is empty. Click 👥 Students to add your class.' : 'No fish yet. A teacher can add students in Teacher mode.');
+  recompute();
+  if (teacher.on){
+    if (feedExam < 0 || feedExam >= DATA.exams.length || sectionChanged) feedExam = defaultFeedExam();
+    renderFeed();
+  }
+}
+
+function updateLast(){
+  var last = -1;
+  DATA.exams.forEach(function(_, e){ if (DATA.students.some(function(s){ return s.scores[e] !== null && s.scores[e] !== undefined; })) last = e; });
+  DATA.lastExam = last;
+}
+function syncExamControls(){
+  var s = $('exam');
+  s.max = Math.max(0, DATA.lastExam);
+  s.value = viewExam;
+  $('examCtl').style.display = DATA.lastExam >= 0 ? '' : 'none';
+  $('play').style.display = DATA.lastExam >= 0 ? '' : 'none';
+}
+
+function recompute(){
+  var k = viewExam, pass = CFG.passingPercent, exp = Math.max(1, CFG.expectedExams);
+  var allPct = 0, allN = 0, seen = {};
+  models = DATA.students.map(function(s, i){
+    var points = 0, total = 0, lastZero = -1, taken = [];
+    for (var e = 0; e <= k; e++){
+      var sc = s.scores[e];
+      if (sc === null || sc === undefined) continue;
+      var mx = (DATA.max && DATA.max[e]) || 100;
+      var pct = clamp(sc / mx * 100, 0, 100);
+      points += pct; total += sc; allPct += pct; allN++;
+      taken.push({e:e, sc:sc, pct:pct});
+      if (sc === 0) lastZero = taken.length - 1;
+    }
+    var latest = taken.length ? taken[taken.length-1] : null;
+    var sick = !!latest && latest.sc === 0;
+    var scar = false, healed = false, zeroExam = null;
+    if (lastZero >= 0){
+      zeroExam = DATA.exams[taken[lastZero].e];
+      if (!sick){
+        var passed = taken.slice(lastZero+1).some(function(x){ return x.pct >= pass; });
+        scar = !passed; healed = passed;
+      }
+    }
+    var delta = null;
+    if (latest && latest.e === k && taken.length >= 2) delta = latest.pct - taken[taken.length-2].pct;
+    var g = clamp(points / (exp*100), 0, 1);
+    var stage = 0;
+    STAGES.forEach(function(st, j){ if (g >= st.at) stage = j; });
+    var key = s.name; seen[key] = (seen[key] || 0) + 1; if (seen[key] > 1) key += '#' + seen[key];
+    return { key:key, i:i, name:s.name, nick:s.nick||'', points:points, total:total, taken:taken,
+      latest:latest, sick:sick, scar:scar, healed:healed, zeroExam:zeroExam, delta:delta, g:g, stage:stage,
+      avg: taken.length ? points/taken.length : null, hue: hash(s.name) % 360, crown:false, improved:false, rank:0 };
+  });
+
+  sortedModels = models.slice().sort(function(a,b){ return b.points - a.points || a.name.localeCompare(b.name); });
+  sortedModels.forEach(function(m, j){
+    var prev = sortedModels[j-1];
+    m.rank = (prev && Math.abs(m.points - prev.points) < 1e-9) ? prev.rank : j+1;
+  });
+  if (sortedModels.length && sortedModels[0].points > 0) sortedModels.forEach(function(m){ if (m.rank === 1) m.crown = true; });
+
+  var best = 0;
+  models.forEach(function(m){ if (m.delta !== null && m.delta > best) best = m.delta; });
+  if (best >= 5) models.forEach(function(m){ if (m.delta !== null && Math.abs(m.delta - best) < 1e-9) m.improved = true; });
+
+  classAvg = allN ? allPct/allN : null;
+  unlocked = new Set(DECOR.filter(function(d){ return classAvg !== null && classAvg >= d.at; }).map(function(d){ return d.key; }));
+
+  syncFish();
+  renderBoard();
+  renderBottom();
+  renderExamLabel();
+  if (cardKey) renderCard();
+}
+
+/* ---------- canvas setup ---------- */
+var cv = $('tank'), ctx = cv.getContext('2d');
+var W = 0, H = 0, DPR = 1, SC = 1;
+var scene = { weeds:[], pebbles:[], rays:[], plankton:[], vents:[] };
+var rayGrad = null;
+
+function sandY(x){ return H*.87 + Math.sin(x*.012)*7*SC + Math.sin(x*.031+1)*4*SC; }
+
+function resize(){
+  var r = cv.getBoundingClientRect();
+  if (!r.width || !r.height) return;
+  W = r.width; H = r.height;
+  // big screens / projectors: use fewer pixels so older laptops stay smooth
+  DPR = Math.min(W*H > 1.8e6 ? 1.25 : 2, window.devicePixelRatio || 1);
+  cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  SC = clamp(Math.min(W/1300, H/760), .5, 1.5);
+  buildScene();
+  fishes.forEach(function(f){ f.x = clamp(f.x, 10, W-10); f.y = clamp(f.y, 40, H*.85); f.newTarget(); });
+}
+
+/* Static parts (water colour, sand, vignette) are painted once into hidden layers
+   and copied each frame, instead of being redrawn from scratch 60 times a second. */
+var layers = { bg:document.createElement('canvas'), sand:document.createElement('canvas'), vig:document.createElement('canvas') };
+function layerCtx(cn){
+  cn.width = cv.width; cn.height = cv.height;
+  var c = cn.getContext('2d'); c.setTransform(DPR,0,0,DPR,0,0); return c;
+}
+function buildLayers(){
+  rayGrad = null;
+  var b = layerCtx(layers.bg);
+  var g = b.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#2a8cc4'); g.addColorStop(.35,'#0f5b93'); g.addColorStop(1,'#04203d');
+  b.fillStyle = g; b.fillRect(0,0,W,H);
+
+  var s = layerCtx(layers.sand);
+  var sg = s.createLinearGradient(0, H*.84, 0, H);
+  sg.addColorStop(0, '#e2c98f'); sg.addColorStop(1, '#a8884d');
+  s.fillStyle = sg; s.beginPath(); s.moveTo(0, H);
+  for (var x = 0; x <= W + 20; x += 20) s.lineTo(x, sandY(x));
+  s.lineTo(W, H); s.closePath(); s.fill();
+  scene.pebbles.forEach(function(p){
+    s.fillStyle = 'hsl(30,20%,' + p.l + '%)';
+    s.beginPath(); s.ellipse(p.x, sandY(p.x) + p.dy, p.r*1.3, p.r, 0, 0, 7); s.fill();
+  });
+
+  var v = layerCtx(layers.vig);
+  var vg = v.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.75);
+  vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,10,25,.45)');
+  v.fillStyle = vg; v.fillRect(0,0,W,H);
+}
+function buildScene(){
+  scene.weeds = [];
+  var n = Math.round(W/62);
+  for (var i=0;i<n;i++) scene.weeds.push({ x:rnd(0,W), h:rnd(70,190)*SC, w:rnd(6,11)*SC, hue:rnd(105,160), ph:rnd(0,6.28), front: Math.random()<.18 });
+  scene.pebbles = [];
+  for (i=0;i<Math.round(W/16);i++){ scene.pebbles.push({ x:rnd(0,W), dy:rnd(6,H*.12), r:rnd(2,6)*SC, l:rnd(45,75) }); }
+  scene.rays = [];
+  for (i=0;i<6;i++) scene.rays.push({ x:rnd(.05,.95), w:rnd(30,90)*SC, s:rnd(.08,.2), p:rnd(0,6), sk:rnd(-.6,.6) });
+  scene.plankton = [];
+  for (i=0;i<70;i++) scene.plankton.push({ x:rnd(0,W), y:rnd(0,H*.85), r:rnd(.6,1.8)*SC, s:rnd(3,10), p:rnd(0,6) });
+  scene.vents = [ {x:W*.23, t:0}, {x:W*.71, t:1.3}, {x:W*.93, t:2.1} ];
+  buildLayers();
+}
+
+/* ---------- fish ---------- */
+function Fish(m){
+  this.m = m; this.prevStage = m.stage; this.prevSick = m.sick; this.prevScar = m.scar;
+  this.x = rnd(.08,.92)*W; this.y = rnd(.2,.72)*H;
+  this.vx = rnd(-20,20); this.vy = 0;
+  this.size = 4; this.flip = this.vx < 0 ? -1 : 1; this.tilt = 0;
+  this.phase = rnd(0,6.28); this.wagP = rnd(0,6.28); this.spd = rnd(.7,1.3);
+  this.bubbleT = rnd(1,7); this.food = null; this.chomp = 0;
+  this.newTarget();
+}
+Fish.prototype.setModel = function(m){
+  if ((this.prevSick && !m.sick) || (this.prevScar && !m.scar && !m.sick)) burst(this.x, this.y, 'heal');
+  else if (m.stage > this.prevStage) burst(this.x, this.y, 'grow');
+  else if (!this.prevSick && m.sick) burst(this.x, this.y, 'sick');
+  var changed = this.prevSick !== m.sick;
+  this.prevSick = m.sick; this.prevScar = m.scar; this.prevStage = m.stage; this.m = m;
+  if (changed) this.newTarget();
+};
+Fish.prototype.targetLen = function(){
+  var crowd = fishes.size > 40 ? .88 : 1;
+  return (20 + this.m.g*92) * SC * crowd;
+};
+Fish.prototype.newTarget = function(){
+  var sy = H*.86;
+  if (this.m.sick){ this.tx = rnd(.06,.94)*W; this.ty = rnd(sy - H*.17, sy - H*.07); }
+  else { this.tx = rnd(.04,.96)*W; this.ty = rnd(H*.17, sy - H*.13); }
+};
+Fish.prototype.update = function(dt){
+  var m = this.m;
+  this.size += (this.targetLen() - this.size) * Math.min(1, dt*1.4);
+  this.chomp = Math.max(0, this.chomp - dt*1.5);
+  var max = (34 + 26*this.spd) * SC * (m.sick ? .33 : 1) * (m.stage === 0 ? 1.15 : 1);
+  var hungry = this.food && !this.food.eaten;
+  if (hungry){ this.tx = this.food.x; this.ty = this.food.y; max = Math.max(max*2, 90*SC); }
+  var dx = this.tx - this.x, dy = this.ty - this.y, d = Math.hypot(dx,dy) || 1;
+  if (hungry){
+    if (d < this.size*.45 + 10*SC) eatFood(this.food, this);
+  } else if (d < 25*SC) this.newTarget();
+  var k = Math.min(1, dt*(hungry ? 2 : .9));
+  this.vx += (dx/d*max - this.vx) * k;
+  this.vy += (dy/d*max*(hungry ? 1 : .55) - this.vy) * k;
+  this.x += this.vx*dt; this.y += this.vy*dt;
+  this.x = clamp(this.x, 10, W-10); this.y = clamp(this.y, 40, H*.86 - 4);
+  var ft = this.vx >= 0 ? 1 : -1;
+  this.flip += (ft - this.flip) * Math.min(1, dt*5);
+  var sp = Math.hypot(this.vx, this.vy);
+  var want = clamp(Math.atan2(this.vy, Math.abs(this.vx)+1)*.6, -.45, .45) * (this.flip < 0 ? -1 : 1);
+  this.tilt += (want - this.tilt) * Math.min(1, dt*3);
+  this.wagP += dt * (m.sick && !hungry ? 2.5 : 6 + sp/max*4);
+  this.bubbleT -= dt;
+  if (this.bubbleT <= 0){
+    var mx = this.x + (this.flip < 0 ? -1 : 1) * this.size*.42;
+    if (m.sick){ bubble(mx, this.y, 'sick'); this.bubbleT = rnd(.8,1.6); }
+    else { bubble(mx, this.y, 'fish'); this.bubbleT = rnd(4,10); }
+  }
+};
+
+function rr(c,x,y,w,h,r){
+  c.beginPath(); c.moveTo(x+r,y); c.lineTo(x+w-r,y); c.quadraticCurveTo(x+w,y,x+w,y+r);
+  c.lineTo(x+w,y+h-r); c.quadraticCurveTo(x+w,y+h,x+w-r,y+h); c.lineTo(x+r,y+h);
+  c.quadraticCurveTo(x,y+h,x,y+h-r); c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y); c.closePath();
+}
+
+/* Draws a fish centred at 0,0 facing right, body length L. */
+function drawFishShape(c, L, o){
+  var st = o.stage, H = L * (st === 0 ? .6 : .52);
+  var hue = o.sick ? 85 : o.hue;
+  var sat = o.sick ? 22 : (st === 0 ? 55 : 78);
+  var lit = o.sick ? 58 : (st === 0 ? 68 : 57);
+  var base = 'hsl('+hue+','+sat+'%,'+lit+'%)';
+  var dark = 'hsl('+((hue+(o.sick?0:12))%360)+','+sat+'%,'+(lit-20)+'%)';
+  var light = 'hsl('+hue+','+sat+'%,'+Math.min(92,lit+22)+'%)';
+  c.globalAlpha = st === 0 ? .9 : 1;
+
+  c.save(); c.translate(-L*.36, 0); c.rotate(o.wag);
+  var tl = L*(st >= 2 ? .36 : .28), th = H*(st >= 3 ? .8 : .55);
+  c.beginPath(); c.moveTo(0,0);
+  c.quadraticCurveTo(-tl*.5, -th*.3, -tl, -th);
+  c.quadraticCurveTo(-tl*.65, 0, -tl, th);
+  c.quadraticCurveTo(-tl*.5, th*.3, 0, 0);
+  c.fillStyle = dark; c.fill();
+  if (st >= 3){ c.strokeStyle = 'rgba(255,220,120,.7)'; c.lineWidth = Math.max(1, L*.012); c.stroke(); }
+  c.restore();
+
+  if (st >= 1){
+    c.beginPath(); c.moveTo(-L*.22, -H*.36);
+    c.quadraticCurveTo(-L*.08, -H*(st >= 3 ? 1.1 : st === 2 ? .92 : .75), L*.14, -H*.42);
+    c.closePath(); c.fillStyle = dark; c.fill();
+  }
+  if (st >= 2){
+    c.beginPath(); c.moveTo(-L*.2, H*.36);
+    c.quadraticCurveTo(-L*.12, H*(st >= 3 ? .85 : .7), L*.02, H*.42);
+    c.closePath(); c.fillStyle = dark; c.fill();
+  }
+
+  var g = c.createLinearGradient(0, -H/2, 0, H/2);
+  g.addColorStop(0, light); g.addColorStop(.55, base); g.addColorStop(1, dark);
+  c.beginPath(); c.ellipse(0, 0, L*.42, H*.5, 0, 0, Math.PI*2);
+  c.fillStyle = g; c.fill();
+
+  if (st >= 1 && !o.sick){
+    c.save(); c.clip();
+    c.fillStyle = 'hsla('+((hue+35)%360)+',85%,'+(lit-8)+'%,.45)';
+    var bands = st >= 2 ? [-.24,-.06,.12] : [-.12,.08];
+    bands.forEach(function(b){ c.beginPath(); c.ellipse(L*b, 0, L*.035, H*.6, 0, 0, Math.PI*2); c.fill(); });
+    if (st >= 2){ c.fillStyle = 'rgba(255,255,255,.22)'; c.beginPath(); c.ellipse(L*.02, H*.32, L*.32, H*.16, 0, 0, Math.PI*2); c.fill(); }
+    if (st >= 3){
+      c.strokeStyle = 'rgba(255,235,160,.35)'; c.lineWidth = Math.max(.8, L*.008);
+      for (var sx = -.3; sx < .25; sx += .08) for (var sy = -.3; sy < .35; sy += .2){
+        c.beginPath(); c.arc(L*sx, H*sy, L*.04, -1.2, 1.2); c.stroke();
+      }
+    }
+    c.restore();
+  }
+  if (st >= 3){
+    c.beginPath(); c.ellipse(0, 0, L*.42, H*.5, 0, 0, Math.PI*2);
+    c.strokeStyle = 'rgba(255,214,90,.95)'; c.lineWidth = Math.max(1.2, L*.02); c.stroke();
+  }
+
+  c.beginPath(); c.arc(L*.14, 0, H*.32, -1.1, 1.1);
+  c.strokeStyle = 'rgba(0,0,0,.18)'; c.lineWidth = Math.max(1, L*.015); c.stroke();
+
+  if (o.scar){
+    c.save(); c.strokeStyle = 'rgba(255,225,225,.95)'; c.lineWidth = Math.max(1.4, L*.022); c.lineCap = 'round';
+    c.beginPath(); c.moveTo(-L*.16, -H*.26); c.lineTo(-L*.02, H*.2); c.stroke();
+    c.lineWidth = Math.max(1, L*.014);
+    for (var q = 0; q < 3; q++){
+      var t1 = .2 + q*.3, px = -L*.16 + L*.14*t1, py = -H*.26 + H*.46*t1;
+      c.beginPath(); c.moveTo(px - L*.04, py + H*.02); c.lineTo(px + L*.04, py - H*.02); c.stroke();
+    }
+    c.restore();
+  }
+
+  if (o.sick){
+    c.save(); c.translate(-L*.08, -H*.08); c.rotate(-.45);
+    rr(c, -L*.13, -H*.11, L*.26, H*.22, H*.06);
+    c.fillStyle = '#f2d3a2'; c.fill(); c.strokeStyle = 'rgba(120,80,40,.5)'; c.lineWidth = 1; c.stroke();
+    c.fillStyle = 'rgba(120,80,40,.45)';
+    for (var b2 = -1; b2 <= 1; b2 += 2) for (var b3 = -1; b3 <= 1; b3 += 2){ c.beginPath(); c.arc(b2*L*.03, b3*H*.035, Math.max(.7, L*.008), 0, 7); c.fill(); }
+    c.restore();
+  }
+
+  c.save(); c.translate(L*.05, H*.12); c.rotate(.5 + o.fin*.35);
+  c.beginPath(); c.ellipse(-L*.06, 0, L*.09, H*.1, 0, 0, Math.PI*2);
+  c.fillStyle = dark; c.globalAlpha *= .85; c.fill(); c.restore();
+
+  var er = Math.max(2.2, L*(st === 0 ? .1 : .075)), ex = L*.24, ey = -H*.1;
+  c.beginPath(); c.arc(ex, ey, er, 0, 7); c.fillStyle = '#fff'; c.fill();
+  c.beginPath(); c.arc(ex + er*.18, ey + (o.sick ? er*.25 : 0), er*.55, 0, 7); c.fillStyle = '#122'; c.fill();
+  c.beginPath(); c.arc(ex + er*.35, ey - er*.25, er*.2, 0, 7); c.fillStyle = '#fff'; c.fill();
+  if (o.sick){
+    c.beginPath(); c.arc(ex, ey, er*1.05, Math.PI, 0); c.lineTo(ex+er, ey - er*.05); c.closePath();
+    c.fillStyle = base; c.fill();
+    c.beginPath(); c.moveTo(ex-er, ey); c.lineTo(ex+er, ey); c.strokeStyle = dark; c.lineWidth = 1; c.stroke();
+  }
+
+  c.beginPath();
+  if (o.chomp > .05){ c.arc(L*.37, H*.06, L*.05*(.5+o.chomp), 0, 7); c.fillStyle = 'rgba(40,10,10,.7)'; c.fill(); }
+  else {
+    if (o.sick) c.arc(L*.36, H*.2, L*.035, Math.PI*1.15, Math.PI*1.85);
+    else c.arc(L*.35, H*.08, L*.035, .2, 1.4);
+    c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = Math.max(1, L*.014); c.stroke();
+  }
+  c.globalAlpha = 1;
+}
+
+function drawStar(c, x, y, r, col){
+  c.fillStyle = col; c.beginPath();
+  c.moveTo(x, y-r); c.quadraticCurveTo(x, y, x+r, y); c.quadraticCurveTo(x, y, x, y+r);
+  c.quadraticCurveTo(x, y, x-r, y); c.quadraticCurveTo(x, y, x, y-r); c.fill();
+}
+
+function drawCrown(c, x, y, w, t){
+  var h = w*.72;
+  c.save(); c.translate(x, y); c.rotate(Math.sin(t*2)*.07);
+  c.beginPath(); c.moveTo(-w/2, 0); c.lineTo(-w/2, -h*.62); c.lineTo(-w/4, -h*.3); c.lineTo(0, -h);
+  c.lineTo(w/4, -h*.3); c.lineTo(w/2, -h*.62); c.lineTo(w/2, 0); c.closePath();
+  var g = c.createLinearGradient(0, -h, 0, 0); g.addColorStop(0, '#fff3a0'); g.addColorStop(1, '#e8a812');
+  c.fillStyle = g; c.fill(); c.strokeStyle = '#a8740a'; c.lineWidth = 1.2; c.stroke();
+  c.fillStyle = '#ff4f6d';
+  [[-w/2,-h*.62],[0,-h],[w/2,-h*.62]].forEach(function(p){ c.beginPath(); c.arc(p[0], p[1], w*.07, 0, 7); c.fill(); });
+  c.fillStyle = '#4fd1ff'; c.beginPath(); c.arc(0, -h*.18, w*.08, 0, 7); c.fill();
+  c.restore();
+}
+
+function drawFishEntity(c, f, t){
+  var m = f.m, L = f.size*(1 + f.chomp*.25), x = f.x, y = f.y, dir = f.flip < 0 ? -1 : 1;
+  if (m.improved){
+    var r = L*.9 + Math.sin(t*3)*5*SC;
+    var g = c.createRadialGradient(x, y, L*.1, x, y, r);
+    g.addColorStop(0, 'rgba(140,255,240,.5)'); g.addColorStop(1, 'rgba(140,255,240,0)');
+    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill();
+  }
+  if (m.stage === 3){
+    var r2 = L*.75;
+    var g2 = c.createRadialGradient(x, y, L*.1, x, y, r2);
+    g2.addColorStop(0, 'rgba(255,215,100,.28)'); g2.addColorStop(1, 'rgba(255,215,100,0)');
+    c.fillStyle = g2; c.beginPath(); c.arc(x, y, r2, 0, 7); c.fill();
+  }
+  if (hoverKey === m.key || cardKey === m.key){
+    c.save(); c.strokeStyle = 'rgba(255,211,77,.95)'; c.lineWidth = 2; c.setLineDash([6,5]); c.lineDashOffset = -t*20;
+    c.beginPath(); c.ellipse(x, y, L*.64, L*.44, 0, 0, 7); c.stroke(); c.restore();
+  }
+  c.save(); c.translate(x, y); c.rotate(f.tilt); c.scale(f.flip, 1);
+  drawFishShape(c, L, { hue:m.hue, stage:m.stage, sick:m.sick, scar:m.scar, chomp:f.chomp,
+    wag: Math.sin(f.wagP) * (m.sick ? .12 : .3), fin: Math.sin(f.wagP*.7) });
+  c.restore();
+  if (m.stage === 3){
+    for (var i = 0; i < 3; i++){
+      var a = t*1.4 + i*2.1 + f.phase;
+      drawStar(c, x + Math.cos(a)*L*.58, y + Math.sin(a*1.3)*L*.38, (2.5 + Math.sin(t*5+i)*1.5)*SC, 'rgba(255,240,170,.9)');
+    }
+  }
+  if (m.crown) drawCrown(c, x + dir*L*.1, y - L*.27 - 3*SC, clamp(L*.36, 14*SC, 32*SC), t);
+  if (showLabels){
+    var fs = Math.round(clamp(11*SC + L*.035, 11, 17));
+    c.font = '600 ' + fs + 'px Fredoka, system-ui, sans-serif';
+    var txt = (m.sick ? '🤒 ' : '') + (m.improved ? '✨ ' : '') + nameOf(m);
+    var lk = txt + '|' + fs;
+    if (f.lblKey !== lk){ f.lblW = c.measureText(txt).width; f.lblKey = lk; }   // measure text only when it changes
+    var tw = f.lblW, ly = y + L*.3 + fs*.9 + 2;
+    rr(c, x - tw/2 - 7, ly - fs*.78, tw + 14, fs*1.4, fs*.7);
+    c.fillStyle = m.sick ? 'rgba(45,62,20,.72)' : 'rgba(0,18,38,.58)'; c.fill();
+    c.fillStyle = m.sick ? '#d9f7aa' : '#fff'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(txt, x, ly - fs*.08);
+  }
+}
+
+/* ---------- bubbles, particles, popups ---------- */
+var bubbles = [], parts = [], popups = [];
+function bubble(x, y, kind, r){
+  if (bubbles.length > 260) return;
+  bubbles.push({ x:x, y:y, r:r || (kind === 'sick' ? rnd(2.5,4.5) : rnd(1.5,3.5))*SC,
+    vy: rnd(25,45)*SC*(kind === 'sick' ? .5 : 1), ph: rnd(0,6), kind:kind, life:0 });
+}
+function burst(x, y, kind){
+  var col = kind === 'heal' ? '#8dffb0' : kind === 'sick' ? '#c7e88a' : kind === 'crumb' ? '#ffcf8a' : '#ffe27a';
+  var n = kind === 'sick' ? 8 : kind === 'crumb' ? 7 : 18;
+  for (var i = 0; i < n; i++){
+    var a = rnd(0, 6.28), s = rnd(30,90)*SC*(kind === 'crumb' ? .5 : 1);
+    parts.push({ x:x, y:y, vx:Math.cos(a)*s, vy:Math.sin(a)*s - 20*SC, life:0, max:rnd(.8,1.5), col:col,
+      r:rnd(3,6)*SC*(kind === 'crumb' ? .6 : 1), heart: kind === 'heal' && i%3 === 0 });
+  }
+}
+function popup(x, y, text, col){ popups.push({ x:x, y:y, text:text, col:col, life:0 }); }
+
+/* ---------- food (teacher feeding) ---------- */
+var foods = [];
+function foodKind(pct){ return pct <= 0 ? 'rotten' : pct < 50 ? 'flakes' : pct < 75 ? 'pellet' : pct < 90 ? 'shrimp' : 'gold'; }
+function dropFood(name, e, val){
+  var f = fishByName(name);
+  var mx = (DATA.max && DATA.max[e]) || 100;
+  var fd = { name:name, e:e, val:val, kind:foodKind(val/mx*100), x: f ? clamp(f.x + rnd(-80,80)*SC, 30, W-30) : W/2,
+    y:-12, vy:0, age:0, rot:rnd(0,6), eaten:false, section: DATA.section };
+  foods.push(fd);
+  if (f){ if (f.food && !f.food.eaten) eatFood(f.food, null); f.food = fd; }
+  else eatFood(fd, null);
+}
+function fishByName(name){
+  var found = null;
+  fishes.forEach(function(f){ if (!found && f.m.name === name) found = f; });
+  return found;
+}
+function eatFood(fd, f){
+  if (fd.eaten) return;
+  fd.eaten = true;
+  var i = foods.indexOf(fd); if (i >= 0) foods.splice(i, 1);
+  if (f){
+    f.food = null; f.chomp = 1;
+    burst(fd.x, fd.y, 'crumb');
+    popup(f.x, f.y - f.size*.45 - 10*SC, fd.val === 0 ? '🤢 0' : '+' + fmt(fd.val), fd.val === 0 ? '#c7e88a' : '#ffe27a');
+  }
+  if (fd.section === DATA.section) applyScore(fd.name, fd.e, fd.val);
+}
+function flushFoods(){ foods.slice().forEach(function(fd){ eatFood(fd, null); }); }
+function applyScore(name, e, val){
+  var s = DATA.students.filter(function(x){ return x.name === name; })[0];
+  if (!s) return;
+  s.scores[e] = val;
+  updateLast();
+  if (followLatest) viewExam = DATA.lastExam;
+  syncExamControls();
+  recompute();
+  if (teacher.on) renderFeedCount();
+}
+function drawFood(c, fd, t){
+  var s = SC;
+  c.save(); c.translate(fd.x, fd.y);
+  if (fd.kind === 'rotten'){
+    c.fillStyle = '#6f7a2c'; c.beginPath(); c.arc(0, 0, 8*s, 0, 7); c.arc(6*s, -3*s, 5*s, 0, 7); c.arc(-5*s, 3*s, 5*s, 0, 7); c.fill();
+    c.fillStyle = '#4a5220'; [[-3,-2],[3,2],[6,-4]].forEach(function(p){ c.beginPath(); c.arc(p[0]*s, p[1]*s, 1.6*s, 0, 7); c.fill(); });
+    c.strokeStyle = 'rgba(190,230,120,.75)'; c.lineWidth = 1.5*s;
+    for (var k = -1; k <= 1; k++){
+      c.beginPath();
+      for (var j = 0; j < 8; j++) c.lineTo(k*7*s + Math.sin(j*1.2 + t*6 + k)*2.5*s, -12*s - j*2.2*s);
+      c.stroke();
+    }
+  } else if (fd.kind === 'flakes'){
+    c.fillStyle = '#ff9f43';
+    [[-6,0,.4],[3,-4,-.6],[5,4,1.1]].forEach(function(p){ c.save(); c.translate(p[0]*s, p[1]*s); c.rotate(p[2] + fd.age*2); c.fillRect(-3.5*s, -2*s, 7*s, 4*s); c.restore(); });
+  } else if (fd.kind === 'pellet'){
+    var g = c.createRadialGradient(-2*s, -2*s, 1, 0, 0, 8*s); g.addColorStop(0, '#e0a060'); g.addColorStop(1, '#7a4a1c');
+    c.fillStyle = g; c.beginPath(); c.arc(0, 0, 7*s, 0, 7); c.fill();
+  } else {
+    var gold = fd.kind === 'gold';
+    if (gold){
+      var gg = c.createRadialGradient(0, 0, 2, 0, 0, 22*s); gg.addColorStop(0, 'rgba(255,220,100,.55)'); gg.addColorStop(1, 'rgba(255,220,100,0)');
+      c.fillStyle = gg; c.beginPath(); c.arc(0, 0, 22*s, 0, 7); c.fill();
+    }
+    c.rotate(Math.sin(fd.age*2)*.4);
+    c.strokeStyle = gold ? '#ffcc33' : '#ff8fa3'; c.lineCap = 'round'; c.lineWidth = 6*s;
+    c.beginPath(); c.arc(0, 0, 8*s, .3, Math.PI*1.45); c.stroke();
+    c.strokeStyle = gold ? '#fff0a8' : '#ffd0da'; c.lineWidth = 1.2*s;
+    for (var q = 0; q < 4; q++){ var a = .6 + q*.6; c.beginPath(); c.moveTo(Math.cos(a)*5*s, Math.sin(a)*5*s); c.lineTo(Math.cos(a)*11*s, Math.sin(a)*11*s); c.stroke(); }
+    c.fillStyle = gold ? '#ffcc33' : '#ff8fa3';
+    c.beginPath(); c.moveTo(Math.cos(1.45*Math.PI)*8*s, Math.sin(1.45*Math.PI)*8*s); c.lineTo(-4*s, -13*s); c.lineTo(4*s, -12*s); c.fill();
+    if (gold) for (var i = 0; i < 3; i++){ var b = t*3 + i*2.1; drawStar(c, Math.cos(b)*15*s, Math.sin(b)*15*s, 2.5*s, '#fff6c0'); }
+  }
+  c.restore();
+}
+
+/* ---------- decorations ---------- */
+function drawCoral(c, x, y, s, t){
+  c.save(); c.lineCap = 'round';
+  function br(x0, y0, a, len, w, d){
+    var sw = Math.sin(t*.8 + d + x0*.01)*.05;
+    var x1 = x0 + Math.cos(a+sw)*len, y1 = y0 + Math.sin(a+sw)*len;
+    c.lineWidth = w; c.beginPath(); c.moveTo(x0,y0); c.lineTo(x1,y1); c.stroke();
+    if (d < 3){ br(x1, y1, a-.48, len*.72, w*.72, d+1); br(x1, y1, a+.42, len*.7, w*.72, d+1); }
+    else { c.beginPath(); c.arc(x1, y1, w*.9, 0, 7); c.fill(); }
+  }
+  c.strokeStyle = '#ff7f8f'; c.fillStyle = '#ffb3bd'; br(x, y, -Math.PI/2, 46*s, 11*s, 0);
+  c.strokeStyle = '#ff9f5a'; c.fillStyle = '#ffd3a3'; br(x + 42*s, y + 2*s, -Math.PI/2 + .25, 32*s, 8*s, 1);
+  c.strokeStyle = '#c779ff'; c.fillStyle = '#e4bfff'; br(x - 36*s, y + 3*s, -Math.PI/2 - .3, 26*s, 7*s, 1);
+  c.restore();
+}
+function drawShells(c, x, y, s, t){
+  c.save(); c.translate(x, y - 6*s); c.rotate(.2 + Math.sin(t*.5)*.03);
+  c.beginPath();
+  for (var i = 0; i < 10; i++){
+    var a = -Math.PI/2 + i*Math.PI/5, r = i%2 ? 9*s : 24*s;
+    c.lineTo(Math.cos(a)*r, Math.sin(a)*r);
+  }
+  c.closePath(); c.fillStyle = '#ff8c42'; c.fill(); c.strokeStyle = '#d4602a'; c.lineWidth = 2*s; c.stroke();
+  c.fillStyle = '#ffd0a8';
+  for (i = 0; i < 5; i++){ var a2 = -Math.PI/2 + i*2*Math.PI/5; c.beginPath(); c.arc(Math.cos(a2)*12*s, Math.sin(a2)*12*s, 1.8*s, 0, 7); c.fill(); }
+  c.restore();
+  c.save(); c.translate(x + 50*s, y - 2*s);
+  c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, 20*s, Math.PI, 0); c.closePath();
+  c.fillStyle = '#ffe6ef'; c.fill(); c.strokeStyle = '#e7a6bd'; c.lineWidth = 1.5*s; c.stroke();
+  for (i = 1; i < 6; i++){ var a3 = Math.PI + i*Math.PI/6; c.beginPath(); c.moveTo(0,0); c.lineTo(Math.cos(a3)*20*s, Math.sin(a3)*20*s); c.stroke(); }
+  c.restore();
+}
+function drawChest(c, x, y, s, t){
+  c.save(); c.translate(x, y);
+  var g = c.createRadialGradient(0, -30*s, 4*s, 0, -30*s, 70*s);
+  g.addColorStop(0, 'rgba(255,220,100,' + (.35 + Math.sin(t*2)*.1) + ')'); g.addColorStop(1, 'rgba(255,220,100,0)');
+  c.fillStyle = g; c.beginPath(); c.arc(0, -30*s, 70*s, 0, 7); c.fill();
+  rr(c, -36*s, -34*s, 72*s, 34*s, 4*s); c.fillStyle = '#8a5a2b'; c.fill();
+  c.fillStyle = '#6d4420'; c.fillRect(-36*s, -22*s, 72*s, 4*s);
+  c.fillStyle = '#e8b830'; c.fillRect(-36*s, -34*s, 6*s, 34*s); c.fillRect(30*s, -34*s, 6*s, 34*s);
+  c.fillStyle = '#ffd84a';
+  for (var i = 0; i < 7; i++){ c.beginPath(); c.ellipse(-24*s + i*8*s, -35*s - (i%2)*4*s, 6*s, 3.5*s, 0, 0, 7); c.fill(); }
+  c.save(); c.translate(-36*s, -34*s); c.rotate(-.55);
+  rr(c, 0, -26*s, 72*s, 26*s, 10*s); c.fillStyle = '#9b6733'; c.fill();
+  c.fillStyle = '#e8b830'; c.fillRect(0, -26*s, 6*s, 26*s); c.fillRect(66*s, -26*s, 6*s, 26*s);
+  c.restore();
+  c.fillStyle = '#e8b830'; c.fillRect(-5*s, -26*s, 10*s, 10*s);
+  c.restore();
+}
+function drawSub(c, x, y, s, t){
+  c.save(); c.translate(x, y + Math.sin(t*.9)*6*s); c.rotate(Math.sin(t*.6)*.03);
+  rr(c, -14*s, -42*s, 30*s, 22*s, 6*s); c.fillStyle = '#f2b51d'; c.fill();
+  c.fillStyle = '#7a8a99'; c.fillRect(4*s, -58*s, 4*s, 18*s); c.fillRect(4*s, -58*s, 12*s, 4*s);
+  c.beginPath(); c.ellipse(0, -8*s, 62*s, 22*s, 0, 0, 7);
+  var g = c.createLinearGradient(0, -30*s, 0, 14*s); g.addColorStop(0, '#ffd44a'); g.addColorStop(1, '#d99a0e');
+  c.fillStyle = g; c.fill(); c.strokeStyle = '#a8740a'; c.lineWidth = 2*s; c.stroke();
+  for (var i = 0; i < 3; i++){
+    c.beginPath(); c.arc(-28*s + i*24*s, -8*s, 7*s, 0, 7); c.fillStyle = '#7fd8ff'; c.fill();
+    c.strokeStyle = '#8a6a1a'; c.lineWidth = 2.5*s; c.stroke();
+    c.beginPath(); c.arc(-30*s + i*24*s, -10*s, 2*s, 0, 7); c.fillStyle = 'rgba(255,255,255,.8)'; c.fill();
+  }
+  c.save(); c.translate(-64*s, -8*s); c.scale(1, Math.cos(t*12));
+  c.fillStyle = '#8b97a3'; c.beginPath(); c.ellipse(0, -9*s, 3.5*s, 9*s, 0, 0, 7); c.ellipse(0, 9*s, 3.5*s, 9*s, 0, 0, 7); c.fill();
+  c.restore();
+  c.restore();
+}
+
+/* ---------- main render ---------- */
+function renderScene(t, dt){
+  var c = ctx;
+  c.drawImage(layers.bg, 0, 0, W, H);
+  if (!rayGrad){
+    rayGrad = c.createLinearGradient(0, 0, 0, H*.85);
+    rayGrad.addColorStop(0, 'rgba(255,255,255,.13)'); rayGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  }
+  scene.rays.forEach(function(r){
+    var x = r.x*W + Math.sin(t*r.s + r.p)*60*SC;
+    c.fillStyle = rayGrad; c.beginPath();
+    c.moveTo(x - r.w*.3, 0); c.lineTo(x + r.w*.3, 0);
+    c.lineTo(x + r.w + r.sk*W*.15, H*.85); c.lineTo(x - r.w + r.sk*W*.15, H*.85); c.fill();
+  });
+  c.strokeStyle = 'rgba(255,255,255,.12)'; c.lineWidth = 2;
+  for (var j = 0; j < 3; j++){
+    c.beginPath();
+    for (var x = 0; x <= W; x += 20) c.lineTo(x, 8 + j*9 + Math.sin(x*.02 + t*(1+j*.3) + j)*3);
+    c.stroke();
+  }
+  c.fillStyle = 'rgba(220,240,255,.35)';
+  scene.plankton.forEach(function(p){
+    var px = (p.x + t*p.s) % W, py = p.y + Math.sin(t*.5 + p.p)*8;
+    c.beginPath(); c.arc(px, py, p.r, 0, 7); c.fill();
+  });
+  scene.weeds.forEach(function(w){ if (!w.front) drawWeed(c, w, t, 1); });
+  c.drawImage(layers.sand, 0, 0, W, H);
+  var s = SC;
+  if (unlocked.has('coral')) drawCoral(c, W*.1, sandY(W*.1) + 6*s, s, t);
+  if (unlocked.has('shells')) drawShells(c, W*.37, sandY(W*.37) + 8*s, s, t);
+  if (unlocked.has('chest')){
+    drawChest(c, W*.58, sandY(W*.58) + 8*s, s, t);
+    if (Math.random() < dt*1.2) bubble(W*.58 + rnd(-20,20)*s, sandY(W*.58) - 40*s, 'gold');
+  }
+  if (unlocked.has('sub')) drawSub(c, W*.84, sandY(W*.84) - 60*s, s, t);
+  scene.vents.forEach(function(v){
+    v.t -= dt;
+    if (v.t <= 0){ bubble(v.x + rnd(-4,4), sandY(v.x), 'vent'); v.t = Math.random() < .3 ? rnd(1.5,4) : rnd(.15,.35); }
+  });
+}
+
+function drawWeed(c, w, t, alpha){
+  var base = sandY(w.x) + 6*SC, seg = 9, px = w.x, py = base;
+  c.lineCap = 'round';
+  for (var i = 1; i <= seg; i++){
+    var nx = w.x + Math.sin(t*.9 + w.ph + i*.45) * i * 1.8 * SC;
+    var ny = base - w.h*i/seg;
+    c.strokeStyle = 'hsla(' + w.hue + ',55%,' + (26 + i*1.5) + '%,' + alpha + ')';
+    c.lineWidth = w.w * (1 - i/seg*.7);
+    c.beginPath(); c.moveTo(px, py); c.lineTo(nx, ny); c.stroke();
+    px = nx; py = ny;
+  }
+}
+
+function renderFX(c, t, dt){
+  for (var i = bubbles.length - 1; i >= 0; i--){
+    var b = bubbles[i];
+    b.life += dt; b.y -= b.vy*dt; b.x += Math.sin(b.life*3 + b.ph)*.35;
+    if (b.y < -10 || (b.kind === 'sick' && b.life > 3.5)){ bubbles.splice(i,1); continue; }
+    c.beginPath(); c.arc(b.x, b.y, b.r, 0, 7);
+    if (b.kind === 'sick'){ c.fillStyle = 'rgba(175,220,110,.3)'; c.strokeStyle = 'rgba(205,240,150,.75)'; }
+    else if (b.kind === 'gold'){ c.fillStyle = 'rgba(255,220,120,.2)'; c.strokeStyle = 'rgba(255,230,150,.7)'; }
+    else { c.fillStyle = 'rgba(200,230,255,.12)'; c.strokeStyle = 'rgba(225,245,255,.6)'; }
+    c.lineWidth = 1; c.fill(); c.stroke();
+    c.beginPath(); c.arc(b.x - b.r*.35, b.y - b.r*.35, b.r*.25, 0, 7); c.fillStyle = 'rgba(255,255,255,.7)'; c.fill();
+  }
+  for (i = parts.length - 1; i >= 0; i--){
+    var p = parts[i];
+    p.life += dt; if (p.life > p.max){ parts.splice(i,1); continue; }
+    p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= .97; p.vy *= .97;
+    c.globalAlpha = 1 - p.life/p.max;
+    if (p.heart){ c.font = Math.round(p.r*3) + 'px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('💚', p.x, p.y); }
+    else drawStar(c, p.x, p.y, p.r, p.col);
+    c.globalAlpha = 1;
+  }
+  for (i = popups.length - 1; i >= 0; i--){
+    var u = popups[i];
+    u.life += dt; if (u.life > 1.8){ popups.splice(i,1); continue; }
+    var fs = Math.round(24*SC + 6);
+    c.globalAlpha = 1 - Math.max(0, u.life - 1)/.8;
+    c.font = '700 ' + fs + 'px Fredoka, system-ui, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.lineWidth = 4; c.strokeStyle = 'rgba(0,20,40,.8)';
+    c.strokeText(u.text, u.x, u.y - u.life*30*SC); c.fillStyle = u.col; c.fillText(u.text, u.x, u.y - u.life*30*SC);
+    c.globalAlpha = 1;
+  }
+}
+
+var lastT = performance.now();
+var cardCtx = $('cardFish').getContext('2d');
+var drawOrder = [];
+var frameErrors = 0;
+function frame(now){
+  requestAnimationFrame(frame);           // schedule first, so one bad frame can never freeze the tank
+  try { drawFrame(now); frameErrors = 0; }
+  catch (err){
+    if (ctx.reset) ctx.reset();           // clear any unbalanced save() left by the failed frame
+    if (++frameErrors === 1 && window.console) console.error('Aquarium frame error:', err);
+    if (frameErrors > 120){ ctx.setTransform(DPR,0,0,DPR,0,0); frameErrors = 0; }
+  }
+}
+function drawFrame(now){
+  var dt = Math.min(.05, Math.max(0, (now - lastT)/1000)); lastT = now;
+  var t = now/1000;
+  ctx.setTransform(DPR,0,0,DPR,0,0); ctx.globalAlpha = 1;
+  if (W && H){
+    renderScene(t, dt);
+    foods.slice().forEach(function(fd){
+      fd.age += dt; fd.vy = Math.min(fd.vy + 70*SC*dt, 75*SC); fd.y += fd.vy*dt; fd.x += Math.sin(fd.age*2 + fd.rot)*.4;
+      var gy = sandY(fd.x) - 8*SC; if (fd.y > gy) fd.y = gy;
+      if (fd.age > 9) eatFood(fd, fishByName(fd.name));
+      else drawFood(ctx, fd, t);
+    });
+    var list = Array.from(fishes.values());
+    list.forEach(function(f){ f.update(dt); });
+    list.sort(function(a,b){ return b.size - a.size; });
+    list.forEach(function(f){ drawFishEntity(ctx, f, t); });
+    renderFX(ctx, t, dt);
+    scene.weeds.forEach(function(w){ if (w.front) drawWeed(ctx, w, t, .85); });
+    ctx.drawImage(layers.vig, 0, 0, W, H);
+    drawOrder = list;
+  }
+  if (cardKey){
+    var f = fishes.get(cardKey);
+    if (f){
+      cardCtx.setTransform(1,0,0,1,0,0); cardCtx.clearRect(0, 0, 260, 172);
+      var L = 34 + f.m.g*46;
+      cardCtx.setTransform(2,0,0,2,130 + L*.2,96);
+      drawFishShape(cardCtx, L, { hue:f.m.hue, stage:f.m.stage, sick:f.m.sick, scar:f.m.scar,
+        wag: Math.sin(t*(f.m.sick ? 2.5 : 6))*(f.m.sick ? .12 : .3), fin: Math.sin(t*4) });
+      if (f.m.crown) drawCrown(cardCtx, L*.1, -L*.27 - 2, clamp(L*.36, 12, 26), t);
+    }
+  }
+}
+
+/* ---------- interaction ---------- */
+function fishAt(px, py){
+  for (var i = drawOrder.length - 1; i >= 0; i--){
+    var f = drawOrder[i], L = Math.max(f.size, 22*SC);
+    var dx = (px - f.x)/(L*.55), dy = (py - f.y)/(L*.4);
+    if (dx*dx + dy*dy <= 1) return f;
+  }
+  return null;
+}
+cv.addEventListener('mousemove', function(e){
+  var r = cv.getBoundingClientRect(), f = fishAt(e.clientX - r.left, e.clientY - r.top);
+  var k = f ? f.m.key : null;
+  cv.style.cursor = f ? 'pointer' : 'default';
+  if (k !== hoverKey){ hoverKey = k; highlightRows(); }
+});
+cv.addEventListener('mouseleave', function(){ hoverKey = null; highlightRows(); });
+cv.addEventListener('click', function(e){
+  var r = cv.getBoundingClientRect(), f = fishAt(e.clientX - r.left, e.clientY - r.top);
+  if (f && teacher.on){ focusFeed(f.m.i); return; }
+  if (f) openCard(f.m.key); else closeCard();
+});
+$('board').addEventListener('click', function(e){
+  var row = e.target.closest('.row'); if (row) openCard(row.getAttribute('data-key'));
+});
+$('board').addEventListener('mouseover', function(e){
+  var row = e.target.closest('.row'); hoverKey = row ? row.getAttribute('data-key') : null;
+});
+$('board').addEventListener('mouseleave', function(){ hoverKey = null; });
+$('cardClose').addEventListener('click', closeCard);
+
+$('exam').addEventListener('input', function(){
+  if (playTimer) stopPlay();
+  viewExam = parseInt(this.value, 10);
+  followLatest = viewExam === DATA.lastExam;
+  recompute();
+});
+$('sectionSel').addEventListener('change', function(){ switchSection(this.value); });
+$('play').addEventListener('click', replay);
+$('labels').addEventListener('click', toggleLabels);
+$('boardBtn').addEventListener('click', toggleBoard);
+$('fs').addEventListener('click', toggleFS);
+$('teachBtn').addEventListener('click', function(){ teacher.on ? exitTeacher() : openLogin(); });
+document.addEventListener('keydown', function(e){
+  lastAct = Date.now();
+  var tag = e.target.tagName;
+  if (e.key === 'Escape'){ if (!$('modal').classList.contains('hidden')) closeModal(); else closeCard(); return; }
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  var k = e.key.toLowerCase();
+  if (k === 'l') toggleLabels();
+  else if (k === 'b') toggleBoard();
+  else if (k === 'f') toggleFS();
+  else if ((k === 'arrowleft' || k === 'arrowright') && DATA){
+    viewExam = clamp(viewExam + (k === 'arrowright' ? 1 : -1), -1, DATA.lastExam);
+    followLatest = viewExam === DATA.lastExam; $('exam').value = viewExam; recompute();
+  }
+});
+document.addEventListener('pointerdown', function(){ lastAct = Date.now(); });
+
+function switchSection(name){
+  currentSection = name;
+  followLatest = true;
+  try {
+    if (gas && google.script.history) google.script.history.replace(null, { section:name });
+    else if (window.history && history.replaceState){ QP.set('section', name); history.replaceState(null, '', '?' + QP.toString() + location.hash); }
+  } catch(e){}
+  return load();
+}
+function toggleLabels(){ showLabels = !showLabels; $('labels').classList.toggle('on', showLabels); }
+function toggleBoard(){ var h = $('side').classList.toggle('hidden'); $('boardBtn').classList.toggle('on', !h); }
+function toggleFS(){
+  var el = document.documentElement;
+  if (document.fullscreenElement){ document.exitFullscreen(); return; }
+  var tip = 'Press F11 (Windows) or Ctrl+Cmd+F (Mac) for full screen';
+  if (el.requestFullscreen) el.requestFullscreen().catch(function(){ toast(tip); });
+  else toast(tip);
+}
+function replay(){
+  if (playTimer){ stopPlay(); return; }
+  if (!DATA || DATA.lastExam < 0) return;
+  followLatest = false; viewExam = -1; $('exam').value = -1; recompute();
+  $('play').textContent = '⏸ Stop'; $('play').classList.add('on');
+  playTimer = setInterval(function(){
+    if (viewExam >= DATA.lastExam){ stopPlay(); return; }
+    viewExam++; $('exam').value = viewExam; recompute();
+  }, 2600);
+}
+function stopPlay(){
+  clearInterval(playTimer); playTimer = null;
+  $('play').textContent = '▶ Replay'; $('play').classList.remove('on');
+  followLatest = viewExam === DATA.lastExam;
+}
+
+var toastT = null;
+function toast(msg){ var el = $('toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function(){ el.classList.remove('show'); }, 3800); }
+function showMsg(msg){ $('msg').firstElementChild.textContent = msg; $('msg').classList.remove('hidden'); }
+function hideMsg(){ $('msg').classList.add('hidden'); }
+
+/* ---------- leaderboard & card ---------- */
+function renderBoard(){
+  var medal = ['🥇','🥈','🥉'];
+  $('board').innerHTML = sortedModels.map(function(m){
+    var icons = (m.crown ? '👑' : '') + (m.improved ? '✨' : '') + (m.sick ? '🤒' : '') + (m.scar ? '🩹' : '');
+    var dot = m.sick ? 'hsl(85,25%,55%)' : 'hsl(' + m.hue + ',75%,58%)';
+    return '<div class="row' + (m.sick ? ' sick' : '') + '" data-key="' + esc(m.key) + '">' +
+      '<div class="rank">' + (m.rank <= 3 && m.points > 0 ? medal[m.rank-1] : m.rank) + '</div>' +
+      '<div class="dot" style="background:' + dot + '"></div>' +
+      '<div class="nm">' + esc(m.name) + ' <small>' + STAGES[m.stage].name + '</small> ' + icons + '</div>' +
+      '<div class="sc">' + fmt(m.total) + '</div></div>';
+  }).join('') || '<div class="empty">No students yet.</div>';
+  $('sideSub').textContent = 'Ranked by total score · ' + (viewExam >= 0 ? 'after ' + DATA.exams[viewExam] : 'start of term');
+  highlightRows();
+}
+function highlightRows(){
+  Array.prototype.forEach.call(document.querySelectorAll('.row'), function(r){
+    var k = r.getAttribute('data-key');
+    r.classList.toggle('hl', k === hoverKey || k === cardKey);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.frow'), function(r){
+    var m = models[+r.getAttribute('data-i')];
+    r.classList.toggle('hl', !!m && m.key === hoverKey);
+  });
+}
+function renderBottom(){
+  var a = classAvg === null ? null : Math.floor(classAvg + 1e-9);   // round down so "50%" always means coral is unlocked
+  $('avgPill').innerHTML = 'Class average <b>' + (a === null ? '—' : a + '%') + '</b><span class="bar"><i style="width:' + (a || 0) + '%"></i></span>';
+  var have = DECOR.filter(function(d){ return unlocked.has(d.key); }).map(function(d){ return d.icon; }).join(' ');
+  var next = DECOR.filter(function(d){ return !unlocked.has(d.key); })[0];
+  $('unlockPill').innerHTML = (have ? have + ' &nbsp;·&nbsp; ' : '') +
+    (next ? 'Next for the class: ' + next.icon + ' ' + next.name + ' at ' + next.at + '% average' : 'Every decoration unlocked! 🎉');
+}
+function renderExamLabel(){ $('examLabel').textContent = viewExam >= 0 ? DATA.exams[viewExam] : 'Start of term'; }
+
+function openCard(key){ cardKey = key; renderCard(); $('card').classList.remove('hidden'); highlightRows(); }
+function closeCard(){ cardKey = null; $('card').classList.add('hidden'); highlightRows(); }
+function renderCard(){
+  var m = models.filter(function(x){ return x.key === cardKey; })[0];
+  if (!m){ closeCard(); return; }
+  $('cardName').textContent = m.name;
+  $('cardSub').textContent = (m.nick ? '🐟 ' + m.nick + ' · ' : '') + STAGES[m.stage].name + ' fish';
+  $('cardStats').innerHTML =
+    '<div class="stat"><b>#' + m.rank + '</b><span>of ' + models.length + '</span></div>' +
+    '<div class="stat"><b>' + fmt(m.total) + '</b><span>Total score</span></div>' +
+    '<div class="stat"><b>' + (m.avg === null ? '—' : Math.round(m.avg) + '%') + '</b><span>Average</span></div>' +
+    '<div class="stat"><b>' + m.taken.length + '</b><span>Exams taken</span></div>';
+  var st = [];
+  if (m.crown) st.push('👑 Top of the class!');
+  if (m.improved) st.push('✨ Most improved: +' + Math.round(m.delta) + '% compared with the previous exam.');
+  if (m.sick) st.push('🤒 Feeling sick after scoring 0 on ' + esc(m.zeroExam) + '. Any score above 0 will make this fish feel better.');
+  else if (m.scar) st.push('🩹 Has a scar from a 0 on ' + esc(m.zeroExam) + '. A passing score (' + CFG.passingPercent + '% or higher) will heal it.');
+  else if (m.healed) st.push('💚 Healed! Bounced back from a 0 with a passing score.');
+  if (!m.sick && !m.scar && !m.crown && !m.improved && !m.healed) st.push('😊 Healthy and swimming happily.');
+  $('cardStatus').innerHTML = st.map(function(s){ return '<div class="status">' + s + '</div>'; }).join('');
+  var exp = Math.max(1, CFG.expectedExams), next = STAGES[m.stage+1];
+  if (next){
+    var cur = STAGES[m.stage].at, frac = (m.g - cur)/(next.at - cur);
+    var need = Math.ceil(next.at*exp*100 - m.points);
+    $('cardProg').innerHTML = 'Growing toward <b>' + next.name + '</b>: about ' + need + ' more points to go' +
+      '<div class="bar"><i style="width:' + Math.round(clamp(frac,0,1)*100) + '%"></i></div>';
+  } else {
+    $('cardProg').innerHTML = '🌟 Fully grown Legend fish!';
+  }
+  renderChart(m);
+}
+function renderChart(m){
+  var svg = $('chart'), n = viewExam + 1;
+  if (n <= 0){ svg.innerHTML = '<text x="210" y="80" fill="#93bfdf" font-size="14" text-anchor="middle">No exams yet</text>'; return; }
+  var scores = DATA.students[m.i].scores, Wc = 420, Hc = 160, top = 22, bottom = 30, pad = 10;
+  var plotH = Hc - top - bottom, slot = (Wc - pad*2)/n, bw = Math.min(38, slot*.66);
+  var passY = top + plotH*(1 - CFG.passingPercent/100);
+  var out = '<line x1="' + pad + '" x2="' + (Wc-pad) + '" y1="' + passY + '" y2="' + passY + '" stroke="#ffd34d" stroke-dasharray="4 4" opacity=".55"/>' +
+    '<text x="' + (Wc-pad) + '" y="' + (passY-4) + '" fill="#ffd34d" font-size="10" text-anchor="end" opacity=".8">passing</text>';
+  for (var e = 0; e < n; e++){
+    var sc = scores[e], mx = (DATA.max && DATA.max[e]) || 100, cx = pad + slot*(e+.5);
+    var lab = String(DATA.exams[e]); if (lab.length > 9) lab = lab.slice(0,8) + '…';
+    out += '<text x="' + cx + '" y="' + (Hc-10) + '" fill="#93bfdf" font-size="10.5" text-anchor="middle">' + esc(lab) + '</text>';
+    if (sc === null || sc === undefined){
+      out += '<text x="' + cx + '" y="' + (top+plotH-6) + '" fill="#6f8fa8" font-size="12" text-anchor="middle">absent</text>';
+      continue;
+    }
+    var pct = clamp(sc/mx*100, 0, 100), h = Math.max(3, plotH*pct/100), y = top + plotH - h;
+    var col = sc === 0 ? '#ff6b6b' : pct >= CFG.passingPercent ? '#4fe0c0' : '#ffb35c';
+    out += '<rect x="' + (cx-bw/2) + '" y="' + y + '" width="' + bw + '" height="' + h + '" rx="5" fill="' + col + '"/>' +
+      '<text x="' + cx + '" y="' + (y-5) + '" fill="#ecf7ff" font-size="12" font-weight="600" text-anchor="middle">' + fmt(sc) + '</text>';
+  }
+  svg.innerHTML = out;
+}
+
+function syncFish(){
+  var keep = new Set();
+  models.forEach(function(m){
+    keep.add(m.key);
+    var f = fishes.get(m.key);
+    if (!f){ f = new Fish(m); fishes.set(m.key, f); } else f.setModel(m);
+  });
+  Array.from(fishes.keys()).forEach(function(k){ if (!keep.has(k)) fishes.delete(k); });
+}
+
+/* ---------- modal ---------- */
+function openModal(html, mount){
+  $('mbody').innerHTML = html;
+  $('modal').classList.remove('hidden');
+  if (mount) mount($('mbody'));
+  var first = $('mbody').querySelector('input,textarea');
+  if (first) setTimeout(function(){ first.focus(); }, 30);
+}
+function closeModal(){ $('modal').classList.add('hidden'); $('mbody').innerHTML = ''; }
+$('modalClose').addEventListener('click', closeModal);
+$('modal').addEventListener('mousedown', function(e){ if (e.target === this) closeModal(); });
+function busy(btn, on, label){ btn.disabled = on; if (label) btn.textContent = label; }
+function onEnter(el, fn){ el.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); fn(); } }); }
+
+/* ---------- teacher mode ---------- */
+var NO_PIN_HELP = 'No teacher PIN has been set yet. Open the Google Sheet and choose 🐠 Aquarium → Set teacher PIN (only people who can edit the sheet can do this), then try again.';
+function openLogin(){
+  if (!DATA){ toast('Please wait for the tank to load.'); return; }
+  openModal('<h3>🔒 Teacher mode</h3><p>Enter your teacher PIN to feed the fish and manage the class.</p>' +
+    (DATA.hasPin === false ? '<p style="color:var(--warn)">' + esc(NO_PIN_HELP) + '</p>' : '') +
+    '<input type="password" id="pinIn" autocomplete="current-password" placeholder="PIN">' +
+    (live ? '' : '<p>Demo PIN: <b>1234</b></p>') +
+    '<div class="err" id="pinErr"></div><div class="actions"><button class="primary" id="pinGo">Unlock</button></div>', function(b){
+      var go = b.querySelector('#pinGo'), inp = b.querySelector('#pinIn');
+      function submit(){
+        var pin = inp.value.trim(); if (!pin) return;
+        busy(go, true, 'Checking…');
+        api('teacherLogin', pin).then(function(){ closeModal(); enterTeacher(pin); })
+          .catch(function(e){
+            b.querySelector('#pinErr').textContent = /NO_PIN/.test((e && e.message) || String(e)) ? NO_PIN_HELP : errText(e);
+            busy(go, false, 'Unlock'); inp.select();
+          });
+      }
+      go.onclick = submit; onEnter(inp, submit);
+    });
+}
+function enterTeacher(pin){
+  teacher.on = true; teacher.pin = pin; lastAct = Date.now();
+  if (playTimer) stopPlay();
+  followLatest = true; viewExam = DATA.lastExam; syncExamControls(); recompute();
+  closeCard();
+  $('teachBtn').textContent = '🔓 Exit teacher'; $('teachBtn').classList.add('on');
+  $('boardView').classList.add('hidden'); $('feedView').classList.remove('hidden');
+  $('side').classList.remove('hidden'); $('boardBtn').classList.add('on');
+  $('sectionCtl').style.display = '';
+  feedExam = defaultFeedExam();
+  renderFeed();
+  toast('Teacher mode on. Remember to exit before students use this screen.');
+}
+function exitTeacher(msg){
+  if (!teacher.on) return;
+  teacher.on = false; teacher.pin = null;
+  $('teachBtn').textContent = '🔒 Teacher'; $('teachBtn').classList.remove('on');
+  $('feedView').classList.add('hidden'); $('boardView').classList.remove('hidden');
+  $('feedList').innerHTML = '';
+  $('sectionCtl').style.display = DATA && DATA.sections.length > 1 ? '' : 'none';
+  closeModal();
+  if (msg) toast(msg);
+  load();
+}
+function handleTeacherError(e){
+  if (isAuthErr(e)) exitTeacher('Your PIN was not accepted (it may have been changed). Please unlock teacher mode again.');
+  else toast('⚠ ' + errText(e));
+}
+setInterval(function(){
+  if (teacher.on && Date.now() - lastAct > 20*60*1000) exitTeacher('Teacher mode locked after 20 minutes of no activity.');
+}, 30000);
+
+function defaultFeedExam(){
+  if (!DATA.exams.length) return -1;
+  var last = DATA.exams.length - 1;
+  return last;
+}
+
+/* feeding list */
+function renderFeed(){
+  var sel = $('feedExam');
+  if (!DATA.exams.length){
+    sel.innerHTML = '<option>No exams yet</option>'; sel.disabled = true;
+    $('feedList').innerHTML = '<div class="empty">' + (DATA.students.length ? 'Click <b>➕ New exam</b> to start feeding.' : 'Add your class first with <b>👥 Students</b>, then click <b>➕ New exam</b>.') + '</div>';
+    $('feedCount').textContent = '';
+    return;
+  }
+  sel.disabled = false;
+  sel.innerHTML = DATA.exams.map(function(x, i){ return '<option value="' + i + '"' + (i === feedExam ? ' selected' : '') + '>' + esc(x) + ' (out of ' + fmt(DATA.max[i] || 100) + ')</option>'; }).join('');
+  var mx = DATA.max[feedExam] || 100;
+  $('feedList').innerHTML = DATA.students.length ? DATA.students.map(function(s, i){
+    var v = s.scores[feedExam];
+    return '<div class="frow" data-i="' + i + '"><span class="num">' + (i+1) + '</span><span class="nm">' + esc(s.name) + '</span>' +
+      '<input type="text" inputmode="decimal" autocomplete="off" data-i="' + i + '" value="' + (v === null || v === undefined ? '' : v) + '">' +
+      '<span class="mx">/ ' + fmt(mx) + '</span><span class="st"></span></div>';
+  }).join('') : '<div class="empty">No students yet. Click <b>👥 Students</b> to add your class.</div>';
+  renderFeedCount();
+}
+function renderFeedCount(){
+  if (feedExam < 0 || !DATA.exams[feedExam]) { $('feedCount').textContent = ''; return; }
+  var n = DATA.students.filter(function(s){ var v = s.scores[feedExam]; return v !== null && v !== undefined; }).length;
+  $('feedCount').textContent = '🐟 ' + n + ' of ' + DATA.students.length + ' fed for ' + DATA.exams[feedExam];
+}
+$('feedExam').addEventListener('change', function(){ feedExam = +this.value; renderFeed(); });
+$('feedList').addEventListener('keydown', function(e){
+  var inp = e.target; if (inp.tagName !== 'INPUT') return;
+  if (e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    e.preventDefault();
+    var ok = submitFeed(inp);
+    if (ok === false && e.key === 'Enter') return;
+    focusFeed(+inp.getAttribute('data-i') + (e.key === 'ArrowUp' ? -1 : 1));
+  }
+});
+$('feedList').addEventListener('focusin', function(e){
+  if (e.target.tagName !== 'INPUT') return;
+  var m = models[+e.target.getAttribute('data-i')]; hoverKey = m ? m.key : null; highlightRows();
+});
+$('feedList').addEventListener('focusout', function(e){ if (e.target.tagName === 'INPUT') submitFeed(e.target); });
+function focusFeed(i){
+  var inp = $('feedList').querySelector('input[data-i="' + i + '"]');
+  if (!inp) return;
+  inp.focus(); inp.select();
+  inp.closest('.frow').scrollIntoView({ block:'nearest', behavior:'smooth' });
+}
+function submitFeed(inp){
+  var i = +inp.getAttribute('data-i'), s = DATA.students[i], e = feedExam;
+  if (!s || e < 0) return;
+  var st = inp.parentNode.querySelector('.st');
+  var raw = inp.value.trim().replace(',', '.');
+  var val = raw === '' ? null : Number(raw);
+  var mx = DATA.max[e] || 100;
+  if (raw !== '' && (!isFinite(val) || val < 0)){ inp.classList.add('err'); st.textContent = '⚠'; toast('Please type a number (or leave it empty if absent).'); return false; }
+  if (val !== null && val > mx){ inp.classList.add('err'); st.textContent = '⚠'; toast('That is more than the perfect score (' + fmt(mx) + ').'); return false; }
+  inp.classList.remove('err');
+  var cur = s.scores[e]; if (cur === undefined) cur = null;
+  var pend = inp.getAttribute('data-pending');
+  var known = pend !== null ? pend : (inp.hasAttribute('data-last') ? inp.getAttribute('data-last') : String(cur));
+  if (String(val) === known) return true;
+  inp.setAttribute('data-pending', String(val));
+  st.textContent = '⏳';
+  if (playTimer) stopPlay();
+  followLatest = true;
+  var section = DATA.section, exam = DATA.exams[e], name = s.name;
+  queueSave({ pin:teacher.pin, section:section, name:name, exam:exam, value:val,
+    ok: function(){
+      inp.removeAttribute('data-pending');
+      inp.setAttribute('data-last', String(val));
+      st.textContent = '✓';
+      if (!DATA || DATA.section !== section) return;
+      var ei = DATA.exams.indexOf(exam); if (ei < 0) return;
+      if (val === null) applyScore(name, ei, null);
+      else dropFood(name, ei, val);
+    },
+    fail: function(err){
+      inp.removeAttribute('data-pending');
+      st.textContent = '⚠'; st.title = errText(err);
+      inp.value = cur === null ? '' : cur;
+      handleTeacherError(err);
+    }
+  });
+  return true;
+}
+
+/* Scores typed quickly are sent together in one request, one request at a time. */
+var saveQ = [], saving = false;
+function queueSave(item){ saveQ.push(item); pumpSaves(); }
+function pumpSaves(){
+  if (saving || !saveQ.length) return;
+  var head = saveQ[0];
+  var batch = saveQ.filter(function(x){ return x.pin === head.pin && x.section === head.section; });
+  saveQ = saveQ.filter(function(x){ return batch.indexOf(x) < 0; });
+  saving = true;
+  api('saveScores', head.pin, head.section, batch.map(function(b){ return { name:b.name, exam:b.exam, value:b.value }; }))
+    .then(function(res){
+      saving = false;
+      batch.forEach(function(b, i){
+        var r = res && res[i];
+        if (r && r.ok) b.ok(); else b.fail(new Error((r && r.error) || 'Not saved.'));
+      });
+      pumpSaves();
+    })
+    .catch(function(err){
+      saving = false;
+      if (isAuthErr(err)){ batch.concat(saveQ).forEach(function(b){ b.fail(err); }); saveQ = []; return; }
+      batch.forEach(function(b){ b.fail(err); });
+      pumpSaves();
+    });
+}
+window.addEventListener('beforeunload', function(e){
+  if (saving || saveQ.length){ e.preventDefault(); e.returnValue = 'Some scores are still saving.'; return e.returnValue; }
+});
+
+/* new exam */
+$('newExamBtn').addEventListener('click', function(){
+  var n = DATA.exams.length + 1;
+  openModal('<h3>➕ New exam</h3><p>This adds a new column for <b>' + esc(DATA.section) + '</b> in your Google Sheet.</p>' +
+    '<label>Exam name</label><input type="text" id="exName" value="Quiz ' + n + '">' +
+    '<label>Perfect score</label><input type="number" id="exMax" value="100" min="1">' +
+    '<div class="err" id="exErr"></div><div class="actions"><button id="exCancel">Cancel</button><button class="primary" id="exGo">Create exam</button></div>', function(b){
+      var go = b.querySelector('#exGo');
+      b.querySelector('#exCancel').onclick = closeModal;
+      function submit(){
+        busy(go, true, 'Creating…');
+        api('addExam', teacher.pin, DATA.section, b.querySelector('#exName').value, b.querySelector('#exMax').value).then(function(d){
+          closeModal(); feedExam = d.exams.length - 1; onData(d); renderFeed(); focusFeed(0);
+          toast('Exam created. Time to feed the fish! 🍤');
+        }).catch(function(e){ if (/WRONG_PIN|NO_PIN/.test(String(e && e.message))) return handleTeacherError(e); b.querySelector('#exErr').textContent = errText(e); busy(go, false, 'Create exam'); });
+      }
+      go.onclick = submit; onEnter(b.querySelector('#exName'), submit); onEnter(b.querySelector('#exMax'), submit);
+    });
+});
+
+/* students */
+$('stuBtn').addEventListener('click', openStudents);
+function openStudents(){
+  var list = DATA.students.map(function(s){
+    return '<div class="srow"><span>' + esc(s.name) + (s.nick ? ' <span class="muted">· ' + esc(s.nick) + '</span>' : '') + '</span>' +
+      '<button data-rm="' + esc(s.name) + '">Remove</button></div>';
+  }).join('');
+  openModal('<h3>👥 Students · ' + esc(DATA.section) + '</h3>' +
+    (list ? '<div class="slist">' + list + '</div>' : '<p>No students yet.</p>') +
+    '<label>Add students, one per line. To give a fish name, write <b>Name / Fish name</b>.</label>' +
+    '<textarea id="addTa" rows="6" placeholder="Dela Cruz, Juan / Bubbles&#10;Santos, Maria"></textarea>' +
+    '<p style="font-size:13px">Tip: you can copy a whole column of names from your class record and paste it here.</p>' +
+    '<div class="err" id="stErr"></div><div class="actions"><button id="stClose">Close</button><button class="primary" id="stAdd">Add students</button></div>', function(b){
+      b.querySelector('#stClose').onclick = closeModal;
+      var add = b.querySelector('#stAdd');
+      add.onclick = function(){
+        var items = b.querySelector('#addTa').value.split(/\r?\n/).map(function(l){
+          var p = l.split(' / '); return { name:(p[0] || '').trim(), nick:(p.slice(1).join(' / ') || '').trim() };
+        }).filter(function(x){ return x.name; });
+        if (!items.length) return;
+        busy(add, true, 'Adding…');
+        api('addStudents', teacher.pin, DATA.section, items).then(function(r){
+          onData(r.data);
+          toast('Added ' + r.added + ' student' + (r.added === 1 ? '' : 's') + (r.skipped.length ? ' (skipped ' + r.skipped.length + ' already in the list)' : '') + ' 🐟');
+          openStudents();
+        }).catch(function(e){ if (/WRONG_PIN|NO_PIN/.test(String(e && e.message))) return handleTeacherError(e); b.querySelector('#stErr').textContent = errText(e); busy(add, false, 'Add students'); });
+      };
+      Array.prototype.forEach.call(b.querySelectorAll('[data-rm]'), function(btn){
+        btn.onclick = function(){
+          if (!btn.classList.contains('danger')){ btn.classList.add('danger'); btn.textContent = 'Remove + scores?'; return; }
+          busy(btn, true, 'Removing…');
+          api('removeStudent', teacher.pin, DATA.section, btn.getAttribute('data-rm')).then(function(d){ onData(d); openStudents(); })
+            .catch(function(e){ handleTeacherError(e); busy(btn, false, 'Remove'); });
+        };
+      });
+    });
+}
+
+/* sections */
+$('secBtn').addEventListener('click', openSections);
+function openSections(){
+  var list = DATA.sections.map(function(s){
+    return '<div class="srow"><span>' + esc(s) + (s === DATA.section ? ' <span class="muted">· showing now</span>' : '') + '</span>' +
+      (s === DATA.section ? '' : '<button data-open="' + esc(s) + '">Open</button>') + '</div>';
+  }).join('');
+  openModal('<h3>🏫 Sections</h3><p>Each section has its own tank and is a tab in your Google Sheet. To rename or delete a section, rename or delete its tab in the sheet.</p>' +
+    '<div class="slist">' + list + '</div>' +
+    '<label>New section name</label><input type="text" id="secName" placeholder="Grade 7 – Rosal">' +
+    '<div class="err" id="secErr"></div><div class="actions"><button id="secClose">Close</button><button class="primary" id="secAdd">Create section</button></div>', function(b){
+      b.querySelector('#secClose').onclick = closeModal;
+      Array.prototype.forEach.call(b.querySelectorAll('[data-open]'), function(btn){
+        btn.onclick = function(){ closeModal(); switchSection(btn.getAttribute('data-open')); };
+      });
+      var add = b.querySelector('#secAdd');
+      function submit(){
+        busy(add, true, 'Creating…');
+        api('addSection', teacher.pin, b.querySelector('#secName').value).then(function(d){
+          closeModal(); currentSection = d.section; followLatest = true; onData(d);
+          toast('Section created. Add your students with 👥 Students.');
+        }).catch(function(e){ if (/WRONG_PIN|NO_PIN/.test(String(e && e.message))) return handleTeacherError(e); b.querySelector('#secErr').textContent = errText(e); busy(add, false, 'Create section'); });
+      }
+      add.onclick = submit; onEnter(b.querySelector('#secName'), submit);
+    });
+}
+
+/* settings */
+$('setBtn').addEventListener('click', function(){
+  openModal('<h3>⚙️ Settings</h3><p>These apply to all sections.</p>' +
+    '<label>Title shown on the tank</label><input type="text" id="sTitle" value="' + esc(CFG.className) + '">' +
+    '<div class="grid2"><div><label>Exams planned this term</label><input type="number" id="sExp" min="1" value="' + CFG.expectedExams + '"></div>' +
+    '<div><label>Passing score (%)</label><input type="number" id="sPass" min="1" max="100" value="' + CFG.passingPercent + '"></div></div>' +
+    '<p style="font-size:13px;margin-top:6px">A student with perfect scores becomes a Legend fish after about 70% of the planned exams.</p>' +
+    '<label class="check"><input type="checkbox" id="sNick"' + (CFG.showFishNames ? ' checked' : '') + '> Label fish with their fish names instead of student names</label>' +
+    '<div class="err" id="sErr"></div><div class="actions"><button id="sCancel">Cancel</button><button class="primary" id="sSave">Save</button></div>' +
+    '<hr style="border:none;border-top:1px solid var(--line);margin:18px 0 6px">' +
+    '<label>Change teacher PIN</label><div class="grid2"><input type="password" id="p1" placeholder="New PIN"><input type="password" id="p2" placeholder="Repeat new PIN"></div>' +
+    '<div class="err" id="pErr"></div><div class="actions"><button id="pSave">Change PIN</button></div>', function(b){
+      b.querySelector('#sCancel').onclick = closeModal;
+      var save = b.querySelector('#sSave');
+      save.onclick = function(){
+        busy(save, true, 'Saving…');
+        api('saveSettings', teacher.pin, DATA.section, {
+          className: b.querySelector('#sTitle').value, expectedExams: b.querySelector('#sExp').value,
+          passingPercent: b.querySelector('#sPass').value, refreshSeconds: CFG.refreshSeconds,
+          showFishNames: b.querySelector('#sNick').checked
+        }).then(function(d){ closeModal(); onData(d); toast('Settings saved.'); })
+          .catch(function(e){ if (/WRONG_PIN|NO_PIN/.test(String(e && e.message))) return handleTeacherError(e); b.querySelector('#sErr').textContent = errText(e); busy(save, false, 'Save'); });
+      };
+      var ps = b.querySelector('#pSave');
+      ps.onclick = function(){
+        var a = b.querySelector('#p1').value.trim(), c = b.querySelector('#p2').value.trim();
+        if (a !== c){ b.querySelector('#pErr').textContent = 'The two PINs do not match.'; return; }
+        busy(ps, true, 'Saving…');
+        api('changePin', teacher.pin, a).then(function(){ teacher.pin = a; b.querySelector('#pErr').textContent = ''; busy(ps, false, 'PIN changed ✓'); })
+          .catch(function(e){ if (/WRONG_PIN|NO_PIN/.test(String(e && e.message))) return handleTeacherError(e); b.querySelector('#pErr').textContent = errText(e); busy(ps, false, 'Change PIN'); });
+      };
+    });
+});
+
+/* ---------- demo backend (only used when this file is opened outside Google Apps Script) ---------- */
+var MOCK = (function(){
+  function demoSection(seed, names, filled, examNames){
+    function r(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0)/4294967296; }
+    var exams = examNames.slice(0, filled);
+    var students = names.map(function(n){
+      var ab = 40 + r()*58;
+      return { name:n, nick:'', scores: exams.map(function(_, e){
+        if (r() < .03) return null;
+        if (r() < .035) return 0;
+        return Math.round(clamp(ab + (r()-.5)*30 + e*2, 5, 100));
+      }) };
+    });
+    return { exams:exams, max:exams.map(function(){ return 100; }), students:students };
+  }
+  var last = ['Santos','Reyes','Cruz','Bautista','Garcia','Mendoza','Torres','Flores','Villanueva','Ramos','Aquino','Castillo','Navarro','Lopez','Rivera','Domingo'];
+  var f1 = ['Ana','Ben','Carlo','Dani','Ella','Franco','Gia','Hans','Isa','Jojo','Kyla','Leo','Mika','Nico','Olive','Paolo','Quinn','Rina','Sam','Tala','Ulysses','Vina','Wes','Xandra','Yuan','Zoe','Aki','Bea','Cris','Dina','Enzo','Faye','Gab','Hope','Ivan','Jade'];
+  var f2 = ['Lia','Marco','Nina','Oscar','Pia','Rafa','Sofia','Tomas','Uma','Vince','Wendy','Yna','Zeke','Abby','Bryan','Clara','Diego','Erika','Fritz','Grace','Hugo','Ivy','Jules','Kim','Luis','Mara','Noel','Odette','Pat','Rey'];
+  var ex = ['Quiz 1','Quiz 2','Long Test 1','Quiz 3','Quiz 4','Long Test 2'];
+  var a = demoSection(20261028, f1.map(function(f, i){ return last[i % 16] + ', ' + f; }), 6, ex);
+  a.students[3].scores[5] = 0;
+  a.students[7].scores = [68, 0, 62, 70, 66, 71];
+  a.students[11].scores = [80, 0, 91, 88, 93, 90];
+  var b = demoSection(4242, f2.map(function(f, i){ return last[(i*5) % 16] + ', ' + f; }), 4, ex);
+  var store = { pin:'1234', settings:{ className:'Class Aquarium', expectedExams:8, passingPercent:75, refreshSeconds:60, showFishNames:false },
+    order:['Grade 7 – Sampaguita','Grade 7 – Rosal'], sections:{ 'Grade 7 – Sampaguita':a, 'Grade 7 – Rosal':b } };
+  function chk(pin){ if (pin !== store.pin) throw new Error('WRONG_PIN: Wrong PIN.'); }
+  function sec(name){ var s = store.sections[name]; if (!s) throw new Error('Section not found.'); return s; }
+  function getData(section){
+    var n = store.sections[section] ? section : store.order[0], s = store.sections[n];
+    return { settings:store.settings, hasPin:true, sections:store.order.slice(), section:n, exams:s.exams, max:s.max, students:s.students, lastExam:0 };
+  }
+  return {
+    getData:getData,
+    teacherLogin:function(pin){ chk(pin); return true; },
+    saveScores:function(pin, section, items){
+      chk(pin); var s = sec(section);
+      return items.map(function(it){
+        var e = s.exams.indexOf(it.exam);
+        var st = s.students.filter(function(x){ return x.name === it.name; })[0];
+        if (!st || e < 0) return { ok:false, error:'Not found. Try reloading.' };
+        if (it.value !== null && it.value > s.max[e]) return { ok:false, error:'That is higher than the perfect score.' };
+        st.scores[e] = it.value; return { ok:true };
+      });
+    },
+    addExam:function(pin, section, name, max){
+      chk(pin); var s = sec(section); name = String(name).trim(); max = Number(max);
+      if (!name) throw new Error('Please give the exam a name.');
+      if (!(max > 0)) throw new Error('The perfect score must be more than 0.');
+      if (s.exams.some(function(x){ return x.toLowerCase() === name.toLowerCase(); })) throw new Error('There is already an exam called "' + name + '".');
+      s.exams.push(name); s.max.push(max); s.students.forEach(function(x){ x.scores.push(null); });
+      return getData(section);
+    },
+    addStudents:function(pin, section, items){
+      chk(pin); var s = sec(section), added = 0, skipped = [];
+      items.forEach(function(it){
+        if (s.students.some(function(x){ return x.name.toLowerCase() === it.name.toLowerCase(); })){ skipped.push(it.name); return; }
+        s.students.push({ name:it.name, nick:it.nick, scores:s.exams.map(function(){ return null; }) }); added++;
+      });
+      return { data:getData(section), added:added, skipped:skipped };
+    },
+    removeStudent:function(pin, section, name){
+      chk(pin); var s = sec(section);
+      s.students = s.students.filter(function(x){ return x.name !== name; });
+      return getData(section);
+    },
+    addSection:function(pin, name){
+      chk(pin); name = String(name).trim();
+      if (!name) throw new Error('Please give the section a name.');
+      if (store.sections[name]) throw new Error('There is already a section called "' + name + '".');
+      store.sections[name] = { exams:[], max:[], students:[] }; store.order.push(name);
+      return getData(name);
+    },
+    saveSettings:function(pin, section, s){
+      chk(pin);
+      store.settings = { className:String(s.className || 'Class Aquarium'), expectedExams:Math.max(1, +s.expectedExams || 10),
+        passingPercent:clamp(+s.passingPercent || 75, 1, 100), refreshSeconds:60, showFishNames:!!s.showFishNames };
+      return getData(section);
+    },
+    changePin:function(pin, np){ chk(pin); if (!/^\S{4,20}$/.test(np)) throw new Error('The PIN must be 4 to 20 characters with no spaces.'); store.pin = np; return true; }
+  };
+})();
+
+/* ---------- start ---------- */
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ fishes.forEach(function(f){ f.lblKey = null; }); });
+new ResizeObserver(resize).observe($('tankWrap'));
+resize();
+if (setupProblem){
+  showMsg('⚠ ' + setupProblem);
+} else if (gas && google.script.url){
+  google.script.url.getLocation(function(loc){
+    currentSection = (loc && loc.parameter && loc.parameter.section) || '';
+    load();
+  });
+} else {
+  currentSection = QP.get('section') || '';
+  if (remote) showMsg('🐠 Filling the tank…');
+  load();
+}
+(function tick(){
+  setTimeout(function(){
+    if (live && !playTimer && !teacher.on && document.visibilityState === 'visible') load();
+    tick();
+  }, Math.max(15, CFG.refreshSeconds || 60)*1000);
+})();
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
