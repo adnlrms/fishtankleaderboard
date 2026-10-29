@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --panel:rgba(5,28,54,.84);
+  --panel:rgba(5,28,54,.92);
   --panel2:rgba(255,255,255,.07);
   --line:rgba(160,215,255,.18);
   --text:#ecf7ff;
@@ -22,15 +22,15 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;background:#021428;color:var(--text);font-family:'Fredoka',system-ui,-apple-system,'Segoe UI',sans-serif;overflow:hidden}
-#app{display:flex;height:100vh;width:100vw}
+#app{display:flex;height:100vh;height:100dvh;width:100vw}
 #tankWrap{position:relative;flex:1;min-width:0;overflow:hidden}
-#tank{display:block;width:100%;height:100%}
+#tank{display:block;width:100%;height:100%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #topbar{position:absolute;top:14px;left:16px;right:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;pointer-events:none;z-index:2}
 #topbar>*{pointer-events:auto}
 #title{font-size:clamp(22px,2.4vw,38px);font-weight:700;letter-spacing:.3px;margin-right:auto;text-shadow:0 3px 12px rgba(0,0,0,.55);pointer-events:none;line-height:1.1}
 #title small{display:block;font-size:.42em;font-weight:500;color:var(--muted);letter-spacing:0;margin-top:2px}
-.pill{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:15px;backdrop-filter:blur(8px)}
-button{font:inherit;font-size:15px;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;backdrop-filter:blur(8px);transition:background .15s,border-color .15s}
+.pill{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 14px;font-size:15px}
+button{font:inherit;font-size:15px;color:var(--text);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;transition:background .15s,border-color .15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 button:hover{background:rgba(25,75,125,.92)}
 button.on{border-color:var(--gold);color:var(--gold)}
 button.primary{background:var(--gold);color:#3a2a00;border-color:var(--gold);font-weight:600}
@@ -68,7 +68,21 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
 .feedTop{display:flex;gap:8px;padding:0 14px 10px}
 .feedTop select{flex:1;min-width:0}
 #feedCount{padding:0 18px 8px;font-size:13px;color:var(--gold)}
-.frow{display:grid;grid-template-columns:22px 1fr 66px 40px 20px;align-items:center;gap:6px;padding:4px 8px;border-radius:10px;font-size:15px}
+.frow{display:grid;grid-template-columns:22px 1fr 62px 36px 18px 30px;align-items:center;gap:5px;padding:4px 8px;border-radius:10px;font-size:15px}
+.curveRow{display:flex;align-items:center;gap:8px;padding:0 18px 8px;font-size:13.5px;cursor:pointer}
+.curveRow input{width:18px;height:18px;accent-color:var(--gold)}
+.frow .bst{width:30px;height:30px;padding:0;font-size:14px;border-radius:50%}
+.frow .bst.has{border-color:#c77dff;background:rgba(199,125,255,.18)}
+.hbar{grid-column:1/-1;font-size:13.5px;color:var(--muted)}
+.hbar .bar{width:100%;height:10px;margin-top:5px}
+.perks{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:4px}
+.perk{display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:14px;padding:8px 4px;font-size:13px}
+.perk b{font-size:26px;font-weight:400;line-height:1.1}
+.perk.sel{border-color:var(--gold);background:rgba(255,211,77,.16);color:var(--gold)}
+#legend a{color:var(--gold);cursor:pointer;text-decoration:none}
+#legend a:hover{text-decoration:underline}
+.rules li{margin:5px 0;line-height:1.45;font-size:14.5px}
+.rules{padding-left:20px;margin:6px 0}
 .frow.hl{background:rgba(255,211,77,.12)}
 .frow .num{color:var(--muted);font-size:12px;text-align:right}
 .frow input{width:66px;padding:5px 8px;text-align:center;font-weight:600}
@@ -83,7 +97,7 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
 #card.hidden{display:none}
 .close{position:absolute;top:10px;right:10px;width:34px;height:34px;padding:0;border-radius:50%;font-size:18px}
 .cardHead{display:flex;gap:14px;align-items:center;padding-right:30px}
-#cardFish{width:130px;height:86px;flex:none;background:radial-gradient(circle,rgba(80,170,255,.28),transparent 70%);border-radius:14px}
+#cardFish{width:180px;height:120px;flex:none;background:radial-gradient(circle,rgba(80,170,255,.28),transparent 70%);border-radius:14px}
 #cardName{font-size:24px;font-weight:700;margin:0;line-height:1.15}
 .muted{color:var(--muted)}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0 10px}
@@ -117,7 +131,56 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
 #msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:4;pointer-events:none}
 #msg div{background:var(--panel);border:1px solid var(--line);padding:16px 22px;border-radius:16px;font-size:18px;max-width:80%;text-align:center}
 #msg.hidden{display:none}
-@media (max-width:900px){#side{width:280px}.row{font-size:14px}}
+#sheetClose{display:none}
+/* tablets & small laptops */
+@media (max-width:1100px){#side{width:300px}.row{font-size:14px}.frow{font-size:14px;grid-template-columns:22px 1fr 62px 18px 30px}.frow .mx{display:none}}
+/* phones (and small tablets in portrait): side panel becomes a bottom sheet, buttons become icons */
+@media (max-width:760px){
+  #topbar{top:8px;left:8px;right:8px;gap:6px}
+  #title{flex-basis:100%;font-size:21px}
+  #title small{font-size:12px}
+  .pill,button{padding:6px 10px;font-size:14px}
+  .lbl{display:none}
+  #fs{display:none}
+  #sectionSel{max-width:130px;font-size:14px}
+  input[type=range]{width:80px}
+  #examLabel{min-width:0;max-width:92px;overflow:hidden;text-overflow:ellipsis}
+  #bottombar{left:8px;right:8px;bottom:8px;gap:6px}
+  #bottombar .pill{font-size:12px;padding:5px 10px}
+  #unlockPill,#updated{display:none}
+  .bar{width:70px}
+  #side{position:fixed;left:0;right:0;bottom:0;width:auto;height:60vh;height:60dvh;z-index:10;border-left:none;border-top:1px solid var(--line);border-radius:18px 18px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.5)}
+  #side h2{font-size:19px;padding:14px 50px 2px 16px}
+  #sheetClose{display:block;position:absolute;top:8px;right:10px;width:36px;height:36px;padding:0;border-radius:50%;font-size:18px;z-index:2}
+  #card{z-index:12;width:calc(100% - 16px);max-height:calc(100% - 16px);padding:14px 14px 12px;border-radius:16px}
+  #cardFish{width:132px;height:88px}
+  #cardName{font-size:20px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .mbox{padding:16px 14px;border-radius:16px}
+  .perks{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))}
+  select,input[type=text],input[type=password],input[type=number],textarea{font-size:16px}
+  .frow input{font-size:16px}
+}
+@media (max-width:760px) and (max-height:500px){ #side{height:85vh;height:85dvh} }
+/* short screens (phones in landscape): compact top bar */
+@media (max-height:500px){
+  #topbar{top:6px;left:8px;right:8px;gap:6px}
+  #title{font-size:18px} #title small{display:none}
+  .pill,button{padding:5px 9px;font-size:13px}
+  .lbl{display:none}
+  input[type=range]{width:80px}
+  #examLabel{min-width:0;max-width:90px;overflow:hidden;text-overflow:ellipsis}
+  #bottombar{bottom:6px} #bottombar .pill{font-size:12px;padding:4px 9px}
+  #unlockPill,#updated{display:none}
+  #side h2{font-size:17px;padding:10px 14px 2px} #side .sub{padding:0 14px 8px;font-size:12px}
+  #legend{display:none}
+  #card{max-height:calc(100% - 12px)}
+}
+/* any touch screen: 16px inputs stop iPhone/iPad from zooming in */
+@media (pointer:coarse){
+  select,input[type=text],input[type=password],input[type=number],textarea,.frow input{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){ .bar>i{transition:none} #toast{transition:none} }
 </style>
 </head>
 <body>
@@ -132,11 +195,11 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
         <input type="range" id="exam" min="-1" max="0" step="1" value="0">
         <span id="examLabel">—</span>
       </div>
-      <button id="play" title="Watch the class grow exam by exam">▶ Replay</button>
-      <button id="labels" class="on" title="Show/hide names (L)">🏷️ Names</button>
-      <button id="boardBtn" class="on" title="Show/hide the side panel (B)">🏆 Board</button>
+      <button id="play" title="Watch the class grow exam by exam">▶<span class="lbl"> Replay</span></button>
+      <button id="labels" class="on" title="Show/hide names (L)">🏷️<span class="lbl"> Names</span></button>
+      <button id="boardBtn" class="on" title="Show/hide the side panel (B)">🏆<span class="lbl"> Board</span></button>
       <button id="fs" title="Full screen (F)">⛶</button>
-      <button id="teachBtn" title="Teacher mode: feed the fish (enter scores)">🔒 Teacher</button>
+      <button id="teachBtn" title="Teacher mode: feed the fish (enter scores)">🔒<span class="lbl"> Teacher</span></button>
     </div>
     <div id="bottombar">
       <div class="pill" id="avgPill">Class average —</div>
@@ -146,7 +209,7 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
     <div id="card" class="hidden">
       <button class="close" id="cardClose" aria-label="Close">×</button>
       <div class="cardHead">
-        <canvas id="cardFish" width="260" height="172"></canvas>
+        <canvas id="cardFish" width="360" height="240"></canvas>
         <div><h2 id="cardName"></h2><div id="cardSub" class="muted"></div></div>
       </div>
       <div class="stats" id="cardStats"></div>
@@ -158,21 +221,23 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
     <div id="msg" class="hidden"><div></div></div>
   </div>
   <aside id="side">
+    <button id="sheetClose" aria-label="Close panel">×</button>
     <div class="view" id="boardView">
       <h2>🏆 Leaderboard</h2>
       <div class="sub" id="sideSub">Ranked by total score</div>
       <div id="board"></div>
       <div id="legend">
-        👑 Top of the class &nbsp; ✨ Most improved<br>
-        🤒 Sick (scored 0 on the latest exam)<br>
-        🩹 Scar (heals with a passing score)<br>
-        Fry → Juvenile → Adult → Legend
+        👑 Top &nbsp; ⭐ Personal best &nbsp; ✨ Most improved &nbsp; ⚡ Boosted<br>
+        💊 Recovering &nbsp; 🤒 Ill &nbsp; 🤢 Very ill &nbsp; 🩹 Scar<br>
+        Fry → Juvenile → Adult → Legend<br>
+        <a id="rulesLink">❤️ How fish health works</a>
       </div>
     </div>
     <div class="view hidden" id="feedView">
       <h2>🍤 Feeding time</h2>
       <div class="sub">Type a score and press <b>Enter</b>. The fish swims up to eat it and the next student is ready. Leave it empty if absent.</div>
       <div class="feedTop"><select id="feedExam"></select><button id="newExamBtn">➕ New exam</button></div>
+      <label class="curveRow" id="curveRow" title="Top score in the class counts as perfect for this exam"><input type="checkbox" id="curveChk"> 🎚️ Curve this exam <span class="muted" id="curveInfo"></span></label>
       <div id="feedCount"></div>
       <div id="feedList"></div>
       <div class="feedFoot">
@@ -192,14 +257,81 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
    or in the sheet: 🐠 Aquarium → Show the aquarium link.
    Leave it empty to see the demo.
    ================================================================ */
-var API_URL = 'https://script.google.com/macros/s/AKfycbwxhSEiVKq5Ev5K3TyLC7-60ZmbEOo0ZBJlWBltSLqxL1kfiET6QEkcinVH6jdWChA9/exec';
+var API_URL = 'https://script.google.com/macros/s/AKfycbwkLF_le1Bl6oNdo5RU_IZT8qv4xhm4uWus3rfhkWDbPIpOvZvOvoJ0P5qTfYgb8Ymk0g/exec';
 </script>
 <script>
 (function(){
 'use strict';
 
-var DEFAULTS = { className:'Class Aquarium', expectedExams:10, passingPercent:75, refreshSeconds:60, showFishNames:false };
+var DEFAULTS = { className:'Class Aquarium', expectedExams:10, illPercent:50, excellentPercent:90, refreshSeconds:60, showFishNames:false };
 var STAGES = [ {name:'Fry',at:0}, {name:'Juvenile',at:.15}, {name:'Adult',at:.40}, {name:'Legend',at:.70} ];
+
+/* Health tiers (health is 0–100%) */
+var TIERS = [
+  { name:'Healthy',    icon:'',   min:100, col:'#4fe0c0' },
+  { name:'Recovering', icon:'💊', min:70,  col:'#ffd34d' },
+  { name:'Ill',        icon:'🤒', min:40,  col:'#ffb35c' },
+  { name:'Very ill',   icon:'🤢', min:0,   col:'#ff6b6b' }
+];
+function tierOf(h){ return h >= 100 ? 0 : h >= 70 ? 1 : h >= 40 ? 2 : 3; }
+
+/* Boosts last 6 hours, fading out during the last hour. Bonus points stay for good. */
+var BOOST_MS = 6*3600*1000, FADE_MS = 3600*1000, clockSkew = 0;
+function nowMs(){ return Date.now() + clockSkew; }      // server time, so a wrong device clock doesn't matter
+function boostLeft(b){ return b.at ? BOOST_MS - (nowMs() - b.at) : -1; }
+function fmtLeft(ms){ var m = Math.max(1, Math.round(ms/60000)); return m >= 60 ? Math.floor(m/60) + 'h ' + (m%60) + 'm' : m + 'm'; }
+
+/* Boost perks: outfits the teacher can give. One per slot is worn (the newest active one). */
+var PERKS = {
+  tophat:  { icon:'🎩', name:'Top hat',        slot:'head' },
+  gradcap: { icon:'🎓', name:'Graduation cap', slot:'head' },
+  party:   { icon:'🥳', name:'Party hat',      slot:'head' },
+  bow:     { icon:'🎀', name:'Bow',            slot:'head' },
+  shades:  { icon:'🕶️', name:'Cool shades',    slot:'eyes' },
+  cape:    { icon:'🦸', name:'Hero cape',      slot:'back' },
+  medal:   { icon:'🏅', name:'Gold medal',     slot:'neck' }
+};
+
+/* ---------- FISH HEALTH RULES ----------
+   Runs through a student's scores in order (absent exams are skipped).
+   "Low" = below the half line (illPercent, default 50% of the perfect score).
+   1. A healthy fish that gets a 0 or a low score becomes ill.
+   2. Three low scores in a row make the fish very ill (health 25%).
+   3. A low (but not 0) score while already ill heals a little: +20–25%,
+      but the fish stays ill (max 69%) — a low score can never make a fish look better
+      than "Ill", so a 2nd low score doesn't look like recovery right before rule 2 hits.
+   4. Half or better, but below "excellent": heals +30% (at half) up to +80% (just below excellent).
+   5. An excellent score (default 90%+) heals completely. Nobody needs a perfect score to get well;
+      a true perfect still gets its own 🌟 celebration.
+   6. Three scores of half or better in a row heal completely.
+   Exactly half counts as a good score everywhere (rules 1, 3, 4 and 6 agree on this).
+   A 0 also leaves a scar, which disappears once the fish is back to full health. */
+function runHealth(taken, lowLine, exLine){
+  exLine = Math.max(lowLine + 1, exLine || 100);
+  var H = 100, lowRun = 0, goodRun = 0, scar = null, hist = [], last = null, lowExams = [];
+  taken.forEach(function(x){
+    var p = x.pct, before = H, ev;
+    if (p < lowLine){
+      lowRun++; goodRun = 0; lowExams.push(x.e); if (lowExams.length > 3) lowExams.shift();
+      if (lowRun >= 3){ H = Math.min(H, 25); ev = 'streakLow'; }
+      else if (x.sc === 0){ H = Math.max(10, Math.min(H - 60, 40)); ev = 'zero'; }       // a 0 is always worse than a low score
+      else if (H >= 70){ H = Math.max(40, Math.min(H - 55, 45)); ev = 'low'; }        // healthy → ill (45%), leaving room for rule 3
+      else { H = Math.min(69, H + 20 + 5*(p/lowLine)); ev = 'effort'; }
+      if (x.sc === 0) scar = x.e;
+    } else {
+      goodRun++; lowRun = 0; lowExams = [];
+      if (p >= exLine){ H = 100; ev = p >= 100 ? 'perfect' : 'excellent'; }
+      else if (goodRun >= 3){ H = 100; ev = 'streakGood'; }
+      else { H = Math.min(100, H + 30 + 50*(p - lowLine)/(exLine - lowLine)); ev = 'heal'; }
+      if (before >= 100) ev = 'fine';
+    }
+    H = Math.round(H);
+    if (H >= 100) scar = null;
+    hist.push({ e:x.e, h:H });
+    last = { ev:ev, e:x.e, before:before, after:H };
+  });
+  return { health:H, tier:tierOf(H), lowRun:lowRun, goodRun:goodRun, scarExam:scar, hist:hist, last:last, lowExams:lowExams };
+}
 var DECOR = [
   {at:50, name:'Coral reef',     icon:'🪸', key:'coral'},
   {at:65, name:'Seashells',      icon:'🐚', key:'shells'},
@@ -313,10 +445,15 @@ function onData(d){
   loadSeq++;   // any older getData still in flight is now stale
   d.sections = Array.isArray(d.sections) && d.sections.length ? d.sections : [d.section || 'Class'];
   d.max = d.exams.map(function(_, i){ var m = d.max && Number(d.max[i]); return m > 0 ? m : 100; });
+  d.curve = d.exams.map(function(_, i){ return !!(d.curve && d.curve[i]); });
   d.students.forEach(function(s){
     s.name = String(s.name); s.nick = s.nick ? String(s.nick) : '';
     s.scores = d.exams.map(function(_, i){ var v = s.scores && s.scores[i]; return (v === null || v === undefined || v === '' || !isFinite(Number(v))) ? null : Number(v); });
   });
+  d.boosts = (Array.isArray(d.boosts) ? d.boosts : []).filter(function(b){ return b && PERKS[b.perk] && b.student; })
+    .map(function(b){ return { id:String(b.id), student:String(b.student), perk:b.perk, points:Math.max(0, Number(b.points) || 0),
+      reason:String(b.reason || ''), exam:String(b.exam || ''), date:String(b.date || ''), at:Number(b.at) || 0 }; });
+  if (Number(d.serverNow) > 0) clockSkew = Number(d.serverNow) - Date.now();
   hideMsg();
   var sectionChanged = DATA && DATA.section !== d.section;
   if (sectionChanged){ flushFoods(); fishes.clear(); closeCard(); }
@@ -353,30 +490,60 @@ function syncExamControls(){
   $('play').style.display = DATA.lastExam >= 0 ? '' : 'none';
 }
 
+/* The score that counts as 100% for each exam. On a curved exam it is the top score in the class. */
+var effMax = [];
+function computeEffMax(){
+  effMax = DATA.exams.map(function(_, e){
+    var mx = DATA.max[e] || 100;
+    if (!DATA.curve[e]) return mx;
+    var top = 0;
+    DATA.students.forEach(function(s){ var v = s.scores[e]; if (v !== null && v !== undefined && v > top) top = v; });
+    return top > 0 ? Math.min(top, mx) : mx;
+  });
+}
+function pctOf(sc, e){ return clamp(sc / (effMax[e] || DATA.max[e] || 100) * 100, 0, 100); }
+
 function recompute(){
-  var k = viewExam, pass = CFG.passingPercent, exp = Math.max(1, CFG.expectedExams);
+  computeEffMax();
+  var k = viewExam, lowLine = clamp(Number(CFG.illPercent) || 50, 1, 99), exp = Math.max(1, CFG.expectedExams);
+  var exLine = clamp(Number(CFG.excellentPercent) || 90, lowLine + 1, 100);
   var allPct = 0, allN = 0, seen = {};
+  var boostsBy = {};
+  (DATA.boosts || []).forEach(function(b){
+    var be = DATA.exams.indexOf(b.exam);
+    if (be > k) return;                                   // given after the exam being viewed
+    (boostsBy[b.student] = boostsBy[b.student] || []).push({ b:b, e:be });
+  });
   models = DATA.students.map(function(s, i){
-    var points = 0, total = 0, lastZero = -1, taken = [];
+    var points = 0, total = 0, taken = [];
     for (var e = 0; e <= k; e++){
       var sc = s.scores[e];
       if (sc === null || sc === undefined) continue;
-      var mx = (DATA.max && DATA.max[e]) || 100;
-      var pct = clamp(sc / mx * 100, 0, 100);
+      var pct = pctOf(sc, e);
       points += pct; total += sc; allPct += pct; allN++;
       taken.push({e:e, sc:sc, pct:pct});
-      if (sc === 0) lastZero = taken.length - 1;
     }
     var latest = taken.length ? taken[taken.length-1] : null;
-    var sick = !!latest && latest.sc === 0;
-    var scar = false, healed = false, zeroExam = null;
-    if (lastZero >= 0){
-      zeroExam = DATA.exams[taken[lastZero].e];
-      if (!sick){
-        var passed = taken.slice(lastZero+1).some(function(x){ return x.pct >= pass; });
-        scar = !passed; healed = passed;
-      }
+    var hl = runHealth(taken, lowLine, exLine);
+    // personal best: the exam being viewed beat every earlier score of this student
+    var pb = null;
+    if (latest && latest.e === k && taken.length >= 2){
+      var prevBest = Math.max.apply(null, taken.slice(0, -1).map(function(x){ return x.pct; }));
+      if (latest.pct > prevBest + .5) pb = { pct:latest.pct, prev:prevBest, e:latest.e };
     }
+    // boosts: newest outfit per slot is worn; bonus points add to the total and to growth
+    var myBoosts = boostsBy[s.name] || [], outfit = {}, outfitA = {}, bonus = 0, justBoosted = 0;
+    myBoosts.forEach(function(x){
+      var pk = PERKS[x.b.perk]; if (!pk) return;
+      bonus += Number(x.b.points) || 0;                     // points are permanent
+      var left = boostLeft(x.b);
+      if (left > 0){                                        // the outfit only lasts 6 hours
+        var a = Math.min(1, left/FADE_MS);
+        outfit[pk.slot] = x.b.perk; outfitA[pk.slot] = a;
+        justBoosted = Math.max(justBoosted, a);
+      }
+    });
+    points += bonus; total += bonus;
     var delta = null;
     if (latest && latest.e === k && taken.length >= 2) delta = latest.pct - taken[taken.length-2].pct;
     var g = clamp(points / (exp*100), 0, 1);
@@ -384,16 +551,20 @@ function recompute(){
     STAGES.forEach(function(st, j){ if (g >= st.at) stage = j; });
     var key = s.name; seen[key] = (seen[key] || 0) + 1; if (seen[key] > 1) key += '#' + seen[key];
     return { key:key, i:i, name:s.name, nick:s.nick||'', points:points, total:total, taken:taken,
-      latest:latest, sick:sick, scar:scar, healed:healed, zeroExam:zeroExam, delta:delta, g:g, stage:stage,
-      avg: taken.length ? points/taken.length : null, hue: hash(s.name) % 360, crown:false, improved:false, rank:0 };
+      latest:latest, health:hl.health, tier:hl.tier, ill:hl.tier >= 2, hl:hl,
+      scar: hl.scarExam !== null, zeroExam: hl.scarExam !== null ? DATA.exams[hl.scarExam] : null,
+      boosts:myBoosts.map(function(x){ return x.b; }), outfit:outfit, outfitA:outfitA, bonus:bonus, justBoosted:justBoosted,
+      delta:delta, g:g, stage:stage, pb:pb,
+      avg: taken.length ? (points - bonus)/taken.length : null, hue: hash(s.name) % 360, crown:false, improved:false, rank:0 };
   });
 
-  sortedModels = models.slice().sort(function(a,b){ return b.points - a.points || a.name.localeCompare(b.name); });
+  // Ranked by the total shown on the board (ties: higher average wins, then same rank)
+  sortedModels = models.slice().sort(function(a,b){ return b.total - a.total || b.points - a.points || a.name.localeCompare(b.name); });
   sortedModels.forEach(function(m, j){
     var prev = sortedModels[j-1];
-    m.rank = (prev && Math.abs(m.points - prev.points) < 1e-9) ? prev.rank : j+1;
+    m.rank = (prev && Math.abs(m.total - prev.total) < 1e-9 && Math.abs(m.points - prev.points) < 1e-9) ? prev.rank : j+1;
   });
-  if (sortedModels.length && sortedModels[0].points > 0) sortedModels.forEach(function(m){ if (m.rank === 1) m.crown = true; });
+  if (sortedModels.length && sortedModels[0].total > 0) sortedModels.forEach(function(m){ if (m.rank === 1) m.crown = true; });
 
   var best = 0;
   models.forEach(function(m){ if (m.delta !== null && m.delta > best) best = m.delta; });
@@ -422,7 +593,7 @@ function resize(){
   if (!r.width || !r.height) return;
   W = r.width; H = r.height;
   // big screens / projectors: use fewer pixels so older laptops stay smooth
-  DPR = Math.min(W*H > 1.8e6 ? 1.25 : 2, window.devicePixelRatio || 1);
+  DPR = Math.min(Q === 2 ? (W*H > 1.8e6 ? 1.25 : 2) : 1, window.devicePixelRatio || 1);
   cv.width = Math.round(W*DPR); cv.height = Math.round(H*DPR);
   ctx.setTransform(DPR,0,0,DPR,0,0);
   SC = clamp(Math.min(W/1300, H/760), .5, 1.5);
@@ -469,27 +640,31 @@ function buildScene(){
   scene.rays = [];
   for (i=0;i<6;i++) scene.rays.push({ x:rnd(.05,.95), w:rnd(30,90)*SC, s:rnd(.08,.2), p:rnd(0,6), sk:rnd(-.6,.6) });
   scene.plankton = [];
-  for (i=0;i<70;i++) scene.plankton.push({ x:rnd(0,W), y:rnd(0,H*.85), r:rnd(.6,1.8)*SC, s:rnd(3,10), p:rnd(0,6) });
+  for (i=0;i<[0,30,70][Q];i++) scene.plankton.push({ x:rnd(0,W), y:rnd(0,H*.85), r:rnd(.6,1.8)*SC, s:rnd(3,10), p:rnd(0,6) });
   scene.vents = [ {x:W*.23, t:0}, {x:W*.71, t:1.3}, {x:W*.93, t:2.1} ];
   buildLayers();
 }
 
 /* ---------- fish ---------- */
 function Fish(m){
-  this.m = m; this.prevStage = m.stage; this.prevSick = m.sick; this.prevScar = m.scar;
+  this.m = m; this.prevStage = m.stage; this.prevHealth = m.health; this.prevBoosts = m.boosts.length; this.prevPb = !!m.pb;
   this.x = rnd(.08,.92)*W; this.y = rnd(.2,.72)*H;
   this.vx = rnd(-20,20); this.vy = 0;
   this.size = 4; this.flip = this.vx < 0 ? -1 : 1; this.tilt = 0;
   this.phase = rnd(0,6.28); this.wagP = rnd(0,6.28); this.spd = rnd(.7,1.3);
   this.bubbleT = rnd(1,7); this.food = null; this.chomp = 0;
   this.newTarget();
+  if (m.ill){ this.x = this.tx; this.y = this.ty; }   // ill fish start where they rest, near the sand
 }
 Fish.prototype.setModel = function(m){
-  if ((this.prevSick && !m.sick) || (this.prevScar && !m.scar && !m.sick)) burst(this.x, this.y, 'heal');
+  if (m.boosts.length > this.prevBoosts) burst(this.x, this.y, 'boost');
+  else if (m.health > this.prevHealth) burst(this.x, this.y, 'heal');
   else if (m.stage > this.prevStage) burst(this.x, this.y, 'grow');
-  else if (!this.prevSick && m.sick) burst(this.x, this.y, 'sick');
-  var changed = this.prevSick !== m.sick;
-  this.prevSick = m.sick; this.prevScar = m.scar; this.prevStage = m.stage; this.m = m;
+  else if (m.health < this.prevHealth) burst(this.x, this.y, 'sick');
+  else if (m.pb && !this.prevPb) burst(this.x, this.y, 'grow');
+  this.prevPb = !!m.pb;
+  var changed = this.m.ill !== m.ill;
+  this.prevHealth = m.health; this.prevStage = m.stage; this.prevBoosts = m.boosts.length; this.m = m;
   if (changed) this.newTarget();
 };
 Fish.prototype.targetLen = function(){
@@ -498,14 +673,15 @@ Fish.prototype.targetLen = function(){
 };
 Fish.prototype.newTarget = function(){
   var sy = H*.86;
-  if (this.m.sick){ this.tx = rnd(.06,.94)*W; this.ty = rnd(sy - H*.17, sy - H*.07); }
+  if (this.m.tier === 3){ this.tx = rnd(.06,.94)*W; this.ty = rnd(sy - H*.1, sy - H*.04); }      // very ill: near the sand
+  else if (this.m.ill){ this.tx = rnd(.06,.94)*W; this.ty = rnd(sy - H*.2, sy - H*.07); }
   else { this.tx = rnd(.04,.96)*W; this.ty = rnd(H*.17, sy - H*.13); }
 };
 Fish.prototype.update = function(dt){
   var m = this.m;
   this.size += (this.targetLen() - this.size) * Math.min(1, dt*1.4);
   this.chomp = Math.max(0, this.chomp - dt*1.5);
-  var max = (34 + 26*this.spd) * SC * (m.sick ? .33 : 1) * (m.stage === 0 ? 1.15 : 1);
+  var max = (34 + 26*this.spd) * SC * [1, .8, .4, .22][m.tier] * (m.stage === 0 ? 1.15 : 1);
   var hungry = this.food && !this.food.eaten;
   if (hungry){ this.tx = this.food.x; this.ty = this.food.y; max = Math.max(max*2, 90*SC); }
   var dx = this.tx - this.x, dy = this.ty - this.y, d = Math.hypot(dx,dy) || 1;
@@ -522,11 +698,12 @@ Fish.prototype.update = function(dt){
   var sp = Math.hypot(this.vx, this.vy);
   var want = clamp(Math.atan2(this.vy, Math.abs(this.vx)+1)*.6, -.45, .45) * (this.flip < 0 ? -1 : 1);
   this.tilt += (want - this.tilt) * Math.min(1, dt*3);
-  this.wagP += dt * (m.sick && !hungry ? 2.5 : 6 + sp/max*4);
+  this.wagP += dt * (m.ill && !hungry ? 2.5 : 6 + sp/max*4);
   this.bubbleT -= dt;
   if (this.bubbleT <= 0){
     var mx = this.x + (this.flip < 0 ? -1 : 1) * this.size*.42;
-    if (m.sick){ bubble(mx, this.y, 'sick'); this.bubbleT = rnd(.8,1.6); }
+    if (m.ill){ bubble(mx, this.y, 'sick'); this.bubbleT = m.tier === 3 ? rnd(.5,1) : rnd(.9,1.8); }
+    else if (m.justBoosted){ bubble(mx, this.y, 'gold'); this.bubbleT = rnd(.6,1.4); }
     else { bubble(mx, this.y, 'fish'); this.bubbleT = rnd(4,10); }
   }
 };
@@ -537,16 +714,23 @@ function rr(c,x,y,w,h,r){
   c.quadraticCurveTo(x,y+h,x,y+h-r); c.lineTo(x,y+r); c.quadraticCurveTo(x,y,x+r,y); c.closePath();
 }
 
-/* Draws a fish centred at 0,0 facing right, body length L. */
+/* Draws a fish centred at 0,0 facing right, body length L.
+   o.tier: 0 healthy, 1 recovering, 2 ill, 3 very ill.  o.outfit: {head, eyes, back, neck} */
 function drawFishShape(c, L, o){
-  var st = o.stage, H = L * (st === 0 ? .6 : .52);
-  var hue = o.sick ? 85 : o.hue;
-  var sat = o.sick ? 22 : (st === 0 ? 55 : 78);
-  var lit = o.sick ? 58 : (st === 0 ? 68 : 57);
+  var st = o.stage, H = L * (st === 0 ? .6 : .52), tier = o.tier || 0, sk = [0, .3, .75, .95][tier];
+  var ill = tier >= 2, outfit = o.outfit || {};
+  var hue0 = o.hue, sat0 = st === 0 ? 55 : 78, lit0 = st === 0 ? 68 : 57;
+  var dh = ((85 - hue0 + 540) % 360) - 180;                     // shortest way round the colour wheel to sickly green
+  var hue = Math.round((hue0 + dh*sk + 360) % 360);
+  var sat = Math.round(sat0 + (22 - sat0)*sk), lit = Math.round(lit0 + (58 - lit0)*sk);
   var base = 'hsl('+hue+','+sat+'%,'+lit+'%)';
-  var dark = 'hsl('+((hue+(o.sick?0:12))%360)+','+sat+'%,'+(lit-20)+'%)';
+  var dark = 'hsl('+((hue+(ill?0:12))%360)+','+sat+'%,'+(lit-20)+'%)';
   var light = 'hsl('+hue+','+sat+'%,'+Math.min(92,lit+22)+'%)';
   c.globalAlpha = st === 0 ? .9 : 1;
+
+  var oa = o.outfitA || {};
+  function wear(slot, fn){ var g0 = c.globalAlpha; c.globalAlpha = g0 * (oa[slot] === undefined ? 1 : oa[slot]); fn(); c.globalAlpha = g0; }
+  if (outfit.back === 'cape') wear('back', function(){ drawCape(c, L, H, o.wag); });
 
   c.save(); c.translate(-L*.36, 0); c.rotate(o.wag);
   var tl = L*(st >= 2 ? .36 : .28), th = H*(st >= 3 ? .8 : .55);
@@ -560,7 +744,7 @@ function drawFishShape(c, L, o){
 
   if (st >= 1){
     c.beginPath(); c.moveTo(-L*.22, -H*.36);
-    c.quadraticCurveTo(-L*.08, -H*(st >= 3 ? 1.1 : st === 2 ? .92 : .75), L*.14, -H*.42);
+    c.quadraticCurveTo(-L*.08, -H*(st >= 3 ? 1.1 : st === 2 ? .92 : .75)*(ill ? .8 : 1), L*.14, -H*.42);
     c.closePath(); c.fillStyle = dark; c.fill();
   }
   if (st >= 2){
@@ -569,14 +753,14 @@ function drawFishShape(c, L, o){
     c.closePath(); c.fillStyle = dark; c.fill();
   }
 
-  var g = c.createLinearGradient(0, -H/2, 0, H/2);
-  g.addColorStop(0, light); g.addColorStop(.55, base); g.addColorStop(1, dark);
+  var g = base;
+  if (Q > 0 || c !== ctx){ g = c.createLinearGradient(0, -H/2, 0, H/2); g.addColorStop(0, light); g.addColorStop(.55, base); g.addColorStop(1, dark); }
   c.beginPath(); c.ellipse(0, 0, L*.42, H*.5, 0, 0, Math.PI*2);
   c.fillStyle = g; c.fill();
 
-  if (st >= 1 && !o.sick){
+  if (st >= 1 && !ill){
     c.save(); c.clip();
-    c.fillStyle = 'hsla('+((hue+35)%360)+',85%,'+(lit-8)+'%,.45)';
+    c.fillStyle = 'hsla('+((hue+35)%360)+',85%,'+(lit-8)+'%,'+(tier ? .25 : .45)+')';
     var bands = st >= 2 ? [-.24,-.06,.12] : [-.12,.08];
     bands.forEach(function(b){ c.beginPath(); c.ellipse(L*b, 0, L*.035, H*.6, 0, 0, Math.PI*2); c.fill(); });
     if (st >= 2){ c.fillStyle = 'rgba(255,255,255,.22)'; c.beginPath(); c.ellipse(L*.02, H*.32, L*.32, H*.16, 0, 0, Math.PI*2); c.fill(); }
@@ -586,6 +770,12 @@ function drawFishShape(c, L, o){
         c.beginPath(); c.arc(L*sx, H*sy, L*.04, -1.2, 1.2); c.stroke();
       }
     }
+    c.restore();
+  }
+  if (tier === 3){   // very ill: blotches
+    c.save(); c.beginPath(); c.ellipse(0, 0, L*.42, H*.5, 0, 0, Math.PI*2); c.clip();
+    c.fillStyle = 'rgba(120,140,60,.35)';
+    [[-.2,-.15,.07],[.02,.2,.05],[-.05,-.28,.04],[-.28,.12,.05]].forEach(function(p){ c.beginPath(); c.arc(L*p[0], H*p[1], L*p[2], 0, 7); c.fill(); });
     c.restore();
   }
   if (st >= 3){
@@ -607,14 +797,12 @@ function drawFishShape(c, L, o){
     c.restore();
   }
 
-  if (o.sick){
-    c.save(); c.translate(-L*.08, -H*.08); c.rotate(-.45);
-    rr(c, -L*.13, -H*.11, L*.26, H*.22, H*.06);
-    c.fillStyle = '#f2d3a2'; c.fill(); c.strokeStyle = 'rgba(120,80,40,.5)'; c.lineWidth = 1; c.stroke();
-    c.fillStyle = 'rgba(120,80,40,.45)';
-    for (var b2 = -1; b2 <= 1; b2 += 2) for (var b3 = -1; b3 <= 1; b3 += 2){ c.beginPath(); c.arc(b2*L*.03, b3*H*.035, Math.max(.7, L*.008), 0, 7); c.fill(); }
-    c.restore();
+  if (tier >= 1){   // bandage(s): one when recovering or ill, two when very ill
+    drawBandage(c, -L*.08, -H*.08, -.45, L, H);
+    if (tier === 3) drawBandage(c, -L*.24, H*.16, .5, L*.8, H*.8);
   }
+
+  if (outfit.neck === 'medal') wear('neck', function(){ drawMedal(c, L, H); });
 
   c.save(); c.translate(L*.05, H*.12); c.rotate(.5 + o.fin*.35);
   c.beginPath(); c.ellipse(-L*.06, 0, L*.09, H*.1, 0, 0, Math.PI*2);
@@ -622,22 +810,108 @@ function drawFishShape(c, L, o){
 
   var er = Math.max(2.2, L*(st === 0 ? .1 : .075)), ex = L*.24, ey = -H*.1;
   c.beginPath(); c.arc(ex, ey, er, 0, 7); c.fillStyle = '#fff'; c.fill();
-  c.beginPath(); c.arc(ex + er*.18, ey + (o.sick ? er*.25 : 0), er*.55, 0, 7); c.fillStyle = '#122'; c.fill();
+  c.beginPath(); c.arc(ex + er*.18, ey + (ill ? er*.25 : 0), er*.55, 0, 7); c.fillStyle = '#122'; c.fill();
   c.beginPath(); c.arc(ex + er*.35, ey - er*.25, er*.2, 0, 7); c.fillStyle = '#fff'; c.fill();
-  if (o.sick){
+  if (ill){   // droopy eyelid
     c.beginPath(); c.arc(ex, ey, er*1.05, Math.PI, 0); c.lineTo(ex+er, ey - er*.05); c.closePath();
     c.fillStyle = base; c.fill();
     c.beginPath(); c.moveTo(ex-er, ey); c.lineTo(ex+er, ey); c.strokeStyle = dark; c.lineWidth = 1; c.stroke();
   }
+  if (outfit.eyes === 'shades') wear('eyes', function(){ drawShades(c, ex, ey, er, L); });
 
   c.beginPath();
   if (o.chomp > .05){ c.arc(L*.37, H*.06, L*.05*(.5+o.chomp), 0, 7); c.fillStyle = 'rgba(40,10,10,.7)'; c.fill(); }
   else {
-    if (o.sick) c.arc(L*.36, H*.2, L*.035, Math.PI*1.15, Math.PI*1.85);
+    if (ill) c.arc(L*.36, H*.2, L*.035, Math.PI*1.15, Math.PI*1.85);
+    else if (tier === 1) { c.moveTo(L*.32, H*.12); c.lineTo(L*.38, H*.12); }
     else c.arc(L*.35, H*.08, L*.035, .2, 1.4);
     c.strokeStyle = 'rgba(0,0,0,.45)'; c.lineWidth = Math.max(1, L*.014); c.stroke();
   }
+  if (tier === 3) drawThermometer(c, L*.4, H*.12, L);
+
+  if (outfit.head) wear('head', function(){ drawHat(c, outfit.head, L, H); });
   c.globalAlpha = 1;
+}
+
+/* ----- outfit & health props (all in fish-local coordinates, fish faces right) ----- */
+function drawBandage(c, x, y, rot, L, H){
+  c.save(); c.translate(x, y); c.rotate(rot);
+  rr(c, -L*.13, -H*.11, L*.26, H*.22, H*.06);
+  c.fillStyle = '#f2d3a2'; c.fill(); c.strokeStyle = 'rgba(120,80,40,.5)'; c.lineWidth = 1; c.stroke();
+  c.fillStyle = 'rgba(120,80,40,.45)';
+  for (var a = -1; a <= 1; a += 2) for (var b = -1; b <= 1; b += 2){ c.beginPath(); c.arc(a*L*.03, b*H*.035, Math.max(.7, L*.008), 0, 7); c.fill(); }
+  c.restore();
+}
+function drawThermometer(c, x, y, L){
+  c.save(); c.translate(x, y); c.rotate(.5);
+  var w = Math.max(1.6, L*.025);
+  rr(c, 0, -w/2, L*.2, w, w/2); c.fillStyle = '#f4f8ff'; c.fill(); c.strokeStyle = 'rgba(0,0,0,.35)'; c.lineWidth = .8; c.stroke();
+  c.fillStyle = '#ff4757'; c.fillRect(L*.08, -w*.25, L*.11, w*.5);
+  c.beginPath(); c.arc(L*.2, 0, w*.9, 0, 7); c.fill();
+  c.restore();
+}
+function drawCape(c, L, H, wag){
+  var w = Math.sin((wag || 0)*3)*H*.12;
+  c.save();
+  c.beginPath(); c.moveTo(L*.18, -H*.4);
+  c.quadraticCurveTo(-L*.05, -H*1.05 + w, -L*.62, -H*.85 + w*1.6);
+  c.lineTo(-L*.56, -H*.15 + w);
+  c.quadraticCurveTo(-L*.2, -H*.05, L*.08, -H*.05);
+  c.closePath();
+  var g = c.createLinearGradient(0, -H*.8, 0, -H*.1); g.addColorStop(0, '#ff4d6d'); g.addColorStop(1, '#b5179e');
+  c.fillStyle = g; c.fill();
+  c.strokeStyle = '#ffd34d'; c.lineWidth = Math.max(1, L*.015); c.stroke();
+  c.restore();
+}
+function drawMedal(c, L, H){
+  c.save(); c.lineCap = 'round';
+  c.strokeStyle = '#2f80ed'; c.lineWidth = Math.max(1.5, L*.035);
+  c.beginPath(); c.moveTo(L*.05, -H*.42); c.lineTo(L*.12, H*.12); c.lineTo(L*.2, -H*.4); c.stroke();
+  var r = Math.max(2.5, L*.065);
+  c.beginPath(); c.arc(L*.12, H*.12 + r*.8, r, 0, 7);
+  c.fillStyle = '#ffd34d'; c.fill(); c.strokeStyle = '#c98a00'; c.lineWidth = Math.max(.8, L*.012); c.stroke();
+  drawStar(c, L*.12, H*.12 + r*.8, r*.6, '#fff6c0');
+  c.restore();
+}
+function drawShades(c, ex, ey, er, L){
+  c.save();
+  c.strokeStyle = '#111'; c.lineWidth = Math.max(1, L*.016);
+  c.beginPath(); c.moveTo(ex - er*1.2, ey - er*.2); c.lineTo(L*.06, ey - er*.5); c.stroke();
+  rr(c, ex - er*1.35, ey - er*.85, er*2.7, er*1.6, er*.6);
+  c.fillStyle = '#141b26'; c.fill();
+  c.strokeStyle = 'rgba(255,255,255,.75)'; c.lineWidth = Math.max(.8, er*.25);
+  c.beginPath(); c.moveTo(ex - er*.6, ey - er*.45); c.lineTo(ex - er*.1, ey - er*.45); c.stroke();
+  c.restore();
+}
+function drawHat(c, kind, L, H){
+  var u = L*.19;   // hat unit
+  c.save(); c.translate(L*.14, -H*.44); c.rotate(-.18);
+  if (kind === 'tophat'){
+    c.fillStyle = '#1d1d28';
+    c.beginPath(); c.ellipse(0, 0, u*1.15, u*.28, 0, 0, 7); c.fill();
+    rr(c, -u*.7, -u*1.5, u*1.4, u*1.5, u*.12); c.fill();
+    c.fillStyle = '#e63946'; c.fillRect(-u*.7, -u*.5, u*1.4, u*.3);
+  } else if (kind === 'gradcap'){
+    c.fillStyle = '#1d1d28';
+    rr(c, -u*.6, -u*.55, u*1.2, u*.6, u*.15); c.fill();
+    c.beginPath(); c.moveTo(-u*1.3, -u*.6); c.lineTo(0, -u*1.05); c.lineTo(u*1.3, -u*.6); c.lineTo(0, -u*.15); c.closePath(); c.fill();
+    c.strokeStyle = '#ffd34d'; c.lineWidth = Math.max(1, u*.12);
+    c.beginPath(); c.moveTo(0, -u*.6); c.lineTo(u*.9, -u*.5); c.lineTo(u*1, u*.15); c.stroke();
+    c.fillStyle = '#ffd34d'; c.beginPath(); c.arc(u*1, u*.2, u*.16, 0, 7); c.fill();
+  } else if (kind === 'party'){
+    c.beginPath(); c.moveTo(-u*.7, 0); c.lineTo(0, -u*1.9); c.lineTo(u*.7, 0); c.closePath();
+    c.fillStyle = '#9b5de5'; c.fill();
+    c.save(); c.clip(); c.strokeStyle = '#ffd34d'; c.lineWidth = u*.22;
+    for (var i = 0; i < 4; i++){ c.beginPath(); c.moveTo(-u, -u*.3 - i*u*.5); c.lineTo(u, -u*.6 - i*u*.5); c.stroke(); }
+    c.restore();
+    c.fillStyle = '#ff4d6d'; c.beginPath(); c.arc(0, -u*1.9, u*.25, 0, 7); c.fill();
+  } else if (kind === 'bow'){
+    c.fillStyle = '#ff5fa2';
+    c.beginPath(); c.moveTo(0, -u*.2); c.quadraticCurveTo(-u*1.1, -u*1.1, -u*1, -u*.1); c.quadraticCurveTo(-u*.6, u*.2, 0, -u*.2); c.fill();
+    c.beginPath(); c.moveTo(0, -u*.2); c.quadraticCurveTo(u*1.1, -u*1.1, u*1, -u*.1); c.quadraticCurveTo(u*.6, u*.2, 0, -u*.2); c.fill();
+    c.fillStyle = '#d6336c'; c.beginPath(); c.arc(0, -u*.2, u*.25, 0, 7); c.fill();
+  }
+  c.restore();
 }
 
 function drawStar(c, x, y, r, col){
@@ -661,61 +935,80 @@ function drawCrown(c, x, y, w, t){
 
 function drawFishEntity(c, f, t){
   var m = f.m, L = f.size*(1 + f.chomp*.25), x = f.x, y = f.y, dir = f.flip < 0 ? -1 : 1;
-  if (m.improved){
-    var r = L*.9 + Math.sin(t*3)*5*SC;
-    var g = c.createRadialGradient(x, y, L*.1, x, y, r);
-    g.addColorStop(0, 'rgba(140,255,240,.5)'); g.addColorStop(1, 'rgba(140,255,240,0)');
-    c.fillStyle = g; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill();
-  }
-  if (m.stage === 3){
-    var r2 = L*.75;
-    var g2 = c.createRadialGradient(x, y, L*.1, x, y, r2);
-    g2.addColorStop(0, 'rgba(255,215,100,.28)'); g2.addColorStop(1, 'rgba(255,215,100,0)');
-    c.fillStyle = g2; c.beginPath(); c.arc(x, y, r2, 0, 7); c.fill();
-  }
+  if (m.improved) drawGlow(c, x, y, L*.9 + Math.sin(t*3)*5*SC, '140,255,240', .5);
+  if (m.stage === 3) drawGlow(c, x, y, L*.75, '255,215,100', .28);
+  if (m.pb && !m.improved) drawGlow(c, x, y, L*.8 + Math.sin(t*4)*3*SC, '255,236,140', .35);
+  if (m.justBoosted) drawGlow(c, x, y, L*.85 + Math.sin(t*6)*4*SC, '190,140,255', .45*m.justBoosted);   // fades with the outfit
   if (hoverKey === m.key || cardKey === m.key){
     c.save(); c.strokeStyle = 'rgba(255,211,77,.95)'; c.lineWidth = 2; c.setLineDash([6,5]); c.lineDashOffset = -t*20;
     c.beginPath(); c.ellipse(x, y, L*.64, L*.44, 0, 0, 7); c.stroke(); c.restore();
   }
   c.save(); c.translate(x, y); c.rotate(f.tilt); c.scale(f.flip, 1);
-  drawFishShape(c, L, { hue:m.hue, stage:m.stage, sick:m.sick, scar:m.scar, chomp:f.chomp,
-    wag: Math.sin(f.wagP) * (m.sick ? .12 : .3), fin: Math.sin(f.wagP*.7) });
+  drawFishShape(c, L, fishLook(m, f.chomp, Math.sin(f.wagP) * (m.ill ? .12 : .3), Math.sin(f.wagP*.7)));
   c.restore();
+  if (m.health < 100){   // health bar
+    var bw = clamp(L*.6, 26*SC, 64*SC), bh = Math.max(3, 4*SC), bx = x - bw/2, by = y - L*.42 - (m.outfit.head ? L*.3 : 0) - 9*SC;
+    rr(c, bx - 1, by - 1, bw + 2, bh + 2, bh); c.fillStyle = 'rgba(0,15,30,.7)'; c.fill();
+    rr(c, bx, by, Math.max(bh, bw*m.health/100), bh, bh/2); c.fillStyle = TIERS[m.tier].col; c.fill();
+  }
   if (m.stage === 3){
     for (var i = 0; i < 3; i++){
       var a = t*1.4 + i*2.1 + f.phase;
       drawStar(c, x + Math.cos(a)*L*.58, y + Math.sin(a*1.3)*L*.38, (2.5 + Math.sin(t*5+i)*1.5)*SC, 'rgba(255,240,170,.9)');
     }
   }
-  if (m.crown) drawCrown(c, x + dir*L*.1, y - L*.27 - 3*SC, clamp(L*.36, 14*SC, 32*SC), t);
+  if (m.crown) drawCrown(c, x + dir*L*.1, y - L*.27 - (m.outfit.head ? L*.36 : 0) - (m.health < 100 ? 12*SC : 3*SC), clamp(L*.36, 14*SC, 32*SC), t);
   if (showLabels){
     var fs = Math.round(clamp(11*SC + L*.035, 11, 17));
     c.font = '600 ' + fs + 'px Fredoka, system-ui, sans-serif';
-    var txt = (m.sick ? '🤒 ' : '') + (m.improved ? '✨ ' : '') + nameOf(m);
+    var txt = (m.tier ? TIERS[m.tier].icon + ' ' : '') + (m.justBoosted ? '⚡ ' : '') + (m.pb ? '⭐ ' : '') + (m.improved ? '✨ ' : '') + nameOf(m);
     var lk = txt + '|' + fs;
     if (f.lblKey !== lk){ f.lblW = c.measureText(txt).width; f.lblKey = lk; }   // measure text only when it changes
     var tw = f.lblW, ly = y + L*.3 + fs*.9 + 2;
     rr(c, x - tw/2 - 7, ly - fs*.78, tw + 14, fs*1.4, fs*.7);
-    c.fillStyle = m.sick ? 'rgba(45,62,20,.72)' : 'rgba(0,18,38,.58)'; c.fill();
-    c.fillStyle = m.sick ? '#d9f7aa' : '#fff'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillStyle = m.ill ? 'rgba(45,62,20,.72)' : 'rgba(0,18,38,.58)'; c.fill();
+    c.fillStyle = m.ill ? '#d9f7aa' : '#fff'; c.textAlign = 'center'; c.textBaseline = 'middle';
     c.fillText(txt, x, ly - fs*.08);
   }
+}
+
+/* Soft glows are painted once into a small sprite and then just stretched — much cheaper than a new gradient per fish per frame. */
+var glowCache = {};
+function drawGlow(c, x, y, r, rgb, alpha){
+  var g = glowCache[rgb];
+  if (!g){
+    g = document.createElement('canvas'); g.width = g.height = 64;
+    var gc = g.getContext('2d'), rg = gc.createRadialGradient(32, 32, 3, 32, 32, 32);
+    rg.addColorStop(0, 'rgba(' + rgb + ',1)'); rg.addColorStop(1, 'rgba(' + rgb + ',0)');
+    gc.fillStyle = rg; gc.fillRect(0, 0, 64, 64); glowCache[rgb] = g;
+  }
+  var a0 = c.globalAlpha; c.globalAlpha = a0 * alpha;
+  c.drawImage(g, x - r, y - r, r*2, r*2);
+  c.globalAlpha = a0;
+}
+
+function fishLook(m, chomp, wag, fin){
+  return { hue:m.hue, stage:m.stage, tier:m.tier, scar:m.scar, outfit:m.outfit, outfitA:m.outfitA, chomp:chomp || 0, wag:wag, fin:fin };
 }
 
 /* ---------- bubbles, particles, popups ---------- */
 var bubbles = [], parts = [], popups = [];
 function bubble(x, y, kind, r){
-  if (bubbles.length > 260) return;
+  if (bubbles.length > [80,160,260][Q]) return;
   bubbles.push({ x:x, y:y, r:r || (kind === 'sick' ? rnd(2.5,4.5) : rnd(1.5,3.5))*SC,
     vy: rnd(25,45)*SC*(kind === 'sick' ? .5 : 1), ph: rnd(0,6), kind:kind, life:0 });
 }
 function burst(x, y, kind){
+  var boostCols = ['#c77dff','#4cc9f0','#ffd34d','#ff5fa2'];
   var col = kind === 'heal' ? '#8dffb0' : kind === 'sick' ? '#c7e88a' : kind === 'crumb' ? '#ffcf8a' : '#ffe27a';
-  var n = kind === 'sick' ? 8 : kind === 'crumb' ? 7 : 18;
+  var n = kind === 'sick' ? 8 : kind === 'crumb' ? 7 : kind === 'boost' ? 28 : 18;
+  if (Q < 2) n = Math.ceil(n/2);
+  if (parts.length > 300) return;
   for (var i = 0; i < n; i++){
-    var a = rnd(0, 6.28), s = rnd(30,90)*SC*(kind === 'crumb' ? .5 : 1);
-    parts.push({ x:x, y:y, vx:Math.cos(a)*s, vy:Math.sin(a)*s - 20*SC, life:0, max:rnd(.8,1.5), col:col,
-      r:rnd(3,6)*SC*(kind === 'crumb' ? .6 : 1), heart: kind === 'heal' && i%3 === 0 });
+    var a = rnd(0, 6.28), s = rnd(30,90)*SC*(kind === 'crumb' ? .5 : kind === 'boost' ? 1.4 : 1);
+    parts.push({ x:x, y:y, vx:Math.cos(a)*s, vy:Math.sin(a)*s - 20*SC, life:0, max:rnd(.8,1.6),
+      col: kind === 'boost' ? boostCols[i % 4] : col,
+      r:rnd(3,6)*SC*(kind === 'crumb' ? .6 : 1), heart: kind === 'heal' && i%3 === 0, bolt: kind === 'boost' && i%5 === 0 });
   }
 }
 function popup(x, y, text, col){ popups.push({ x:x, y:y, text:text, col:col, life:0 }); }
@@ -725,7 +1018,8 @@ var foods = [];
 function foodKind(pct){ return pct <= 0 ? 'rotten' : pct < 50 ? 'flakes' : pct < 75 ? 'pellet' : pct < 90 ? 'shrimp' : 'gold'; }
 function dropFood(name, e, val){
   var f = fishByName(name);
-  var mx = (DATA.max && DATA.max[e]) || 100;
+  computeEffMax();
+  var mx = effMax[e] || DATA.max[e] || 100;
   var fd = { name:name, e:e, val:val, kind:foodKind(val/mx*100), x: f ? clamp(f.x + rnd(-80,80)*SC, 30, W-30) : W/2,
     y:-12, vy:0, age:0, rot:rnd(0,6), eaten:false, section: DATA.section };
   foods.push(fd);
@@ -744,9 +1038,17 @@ function eatFood(fd, f){
   if (f){
     f.food = null; f.chomp = 1;
     burst(fd.x, fd.y, 'crumb');
-    popup(f.x, f.y - f.size*.45 - 10*SC, fd.val === 0 ? '🤢 0' : '+' + fmt(fd.val), fd.val === 0 ? '#c7e88a' : '#ffe27a');
   }
+  var h0 = f ? f.m.health : null;
   if (fd.section === DATA.section) applyScore(fd.name, fd.e, fd.val);
+  if (f){
+    var nf = fishByName(fd.name) || f, dh = h0 === null ? 0 : nf.m.health - h0;
+    var fp = pctOf(fd.val, fd.e), exl = Number(CFG.excellentPercent) || 90;
+    var txt = (fd.val === 0 ? '🤢 0' : (fp >= 100 ? '🌟 ' : fp >= exl ? '🏆 ' : '') + '+' + fmt(fd.val)) + (dh > 0 ? '  ❤️+' + dh + '%' : dh < 0 ? '  💔' + dh + '%' : '');
+    if (fp >= 100) burst(nf.x, nf.y, 'boost');
+    if (nf.m.pb && nf.m.pb.e === fd.e) popup(nf.x, nf.y - nf.size*.45 - 44*SC, '⭐ Personal best!', '#ffe27a');
+    popup(nf.x, nf.y - nf.size*.45 - 14*SC, txt, dh < 0 || fd.val === 0 ? '#c7e88a' : dh > 0 ? '#8dffb0' : '#ffe27a');
+  }
 }
 function flushFoods(){ foods.slice().forEach(function(fd){ eatFood(fd, null); }); }
 function applyScore(name, e, val){
@@ -757,7 +1059,7 @@ function applyScore(name, e, val){
   if (followLatest) viewExam = DATA.lastExam;
   syncExamControls();
   recompute();
-  if (teacher.on) renderFeedCount();
+  if (teacher.on){ renderFeedCount(); updateCurveInfo(); }
 }
 function drawFood(c, fd, t){
   var s = SC;
@@ -870,7 +1172,7 @@ function renderScene(t, dt){
     rayGrad = c.createLinearGradient(0, 0, 0, H*.85);
     rayGrad.addColorStop(0, 'rgba(255,255,255,.13)'); rayGrad.addColorStop(1, 'rgba(255,255,255,0)');
   }
-  scene.rays.forEach(function(r){
+  if (Q > 0) scene.rays.forEach(function(r){
     var x = r.x*W + Math.sin(t*r.s + r.p)*60*SC;
     c.fillStyle = rayGrad; c.beginPath();
     c.moveTo(x - r.w*.3, 0); c.lineTo(x + r.w*.3, 0);
@@ -933,7 +1235,7 @@ function renderFX(c, t, dt){
     p.life += dt; if (p.life > p.max){ parts.splice(i,1); continue; }
     p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= .97; p.vy *= .97;
     c.globalAlpha = 1 - p.life/p.max;
-    if (p.heart){ c.font = Math.round(p.r*3) + 'px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('💚', p.x, p.y); }
+    if (p.heart || p.bolt){ c.font = Math.round(p.r*3) + 'px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(p.heart ? '💚' : '⚡', p.x, p.y); }
     else drawStar(c, p.x, p.y, p.r, p.col);
     c.globalAlpha = 1;
   }
@@ -953,8 +1255,34 @@ var lastT = performance.now();
 var cardCtx = $('cardFish').getContext('2d');
 var drawOrder = [];
 var frameErrors = 0;
+
+/* ---------- adaptive quality: 2 = full, 1 = lighter, 0 = lightest (30 fps) ----------
+   Starts lighter on weak devices or when "reduce motion" is on, and steps down
+   automatically if the tank can't keep up, so it never feels laggy. */
+var Q = 2, perfN = 0, perfSum = 0, perfBad = 0, lastDraw = 0;
+var reduceMotion = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+if (reduceMotion || (navigator.deviceMemory && navigator.deviceMemory <= 2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2)) Q = 1;
+function setQuality(q){
+  if (q === Q) return;
+  Q = q; perfN = perfSum = perfBad = 0;
+  if (window.console) console.info('Aquarium quality set to ' + ['low','medium','high'][Q] + ' for smooth animation.');
+  resize();
+}
+function trackPerf(ms){
+  if (ms > 400) return;                    // tab was in the background, ignore
+  perfN++; perfSum += ms;
+  if (perfSum >= 1500 && perfN >= 8){      // check about every 1.5 seconds
+    var avg = perfSum / perfN;
+    perfBad = avg > (Q === 0 ? 40 : 24) ? perfBad + 1 : 0;   // slower than ~42 fps (or ~25 in low mode)
+    perfN = perfSum = 0;
+    if (Q > 0 && (perfBad >= 2 || avg > 70)) setQuality(avg > 90 ? 0 : Q - 1);   // very slow: go straight to low
+  }
+}
 function frame(now){
   requestAnimationFrame(frame);           // schedule first, so one bad frame can never freeze the tank
+  if (Q === 0 && now - lastDraw < 30) return;        // low mode: ~30 fps
+  if (lastDraw) trackPerf(now - lastDraw);
+  lastDraw = now;
   try { drawFrame(now); frameErrors = 0; }
   catch (err){
     if (ctx.reset) ctx.reset();           // clear any unbalanced save() left by the failed frame
@@ -980,18 +1308,17 @@ function drawFrame(now){
     list.forEach(function(f){ drawFishEntity(ctx, f, t); });
     renderFX(ctx, t, dt);
     scene.weeds.forEach(function(w){ if (w.front) drawWeed(ctx, w, t, .85); });
-    ctx.drawImage(layers.vig, 0, 0, W, H);
+    if (Q > 0) ctx.drawImage(layers.vig, 0, 0, W, H);
     drawOrder = list;
   }
   if (cardKey){
     var f = fishes.get(cardKey);
     if (f){
-      cardCtx.setTransform(1,0,0,1,0,0); cardCtx.clearRect(0, 0, 260, 172);
-      var L = 34 + f.m.g*46;
-      cardCtx.setTransform(2,0,0,2,130 + L*.2,96);
-      drawFishShape(cardCtx, L, { hue:f.m.hue, stage:f.m.stage, sick:f.m.sick, scar:f.m.scar,
-        wag: Math.sin(t*(f.m.sick ? 2.5 : 6))*(f.m.sick ? .12 : .3), fin: Math.sin(t*4) });
-      if (f.m.crown) drawCrown(cardCtx, L*.1, -L*.27 - 2, clamp(L*.36, 12, 26), t);
+      cardCtx.setTransform(1,0,0,1,0,0); cardCtx.clearRect(0, 0, 360, 240);
+      var hat = !!f.m.outfit.head, L = (hat ? 46 : 50) + f.m.g*(hat ? 52 : 60);
+      cardCtx.setTransform(2,0,0,2,180 + L*.2, hat ? 146 : 128);
+      drawFishShape(cardCtx, L, fishLook(f.m, 0, Math.sin(t*(f.m.ill ? 2.5 : 6))*(f.m.ill ? .12 : .3), Math.sin(t*4)));
+      if (f.m.crown && !hat) drawCrown(cardCtx, L*.1, -L*.27 - 2, clamp(L*.36, 12, 26), t);
     }
   }
 }
@@ -1063,6 +1390,9 @@ function switchSection(name){
   } catch(e){}
   return load();
 }
+function setBtn(el, icon, label){ el.innerHTML = icon + '<span class="lbl"> ' + esc(label) + '</span>'; el.setAttribute('aria-label', label); }
+function isNarrow(){ return !!(window.matchMedia && matchMedia('(max-width:760px)').matches); }
+$('sheetClose').addEventListener('click', function(){ if (!$('side').classList.contains('hidden')) toggleBoard(); });
 function toggleLabels(){ showLabels = !showLabels; $('labels').classList.toggle('on', showLabels); }
 function toggleBoard(){ var h = $('side').classList.toggle('hidden'); $('boardBtn').classList.toggle('on', !h); }
 function toggleFS(){
@@ -1076,7 +1406,7 @@ function replay(){
   if (playTimer){ stopPlay(); return; }
   if (!DATA || DATA.lastExam < 0) return;
   followLatest = false; viewExam = -1; $('exam').value = -1; recompute();
-  $('play').textContent = '⏸ Stop'; $('play').classList.add('on');
+  setBtn($('play'), '⏸', 'Stop'); $('play').classList.add('on');
   playTimer = setInterval(function(){
     if (viewExam >= DATA.lastExam){ stopPlay(); return; }
     viewExam++; $('exam').value = viewExam; recompute();
@@ -1084,7 +1414,7 @@ function replay(){
 }
 function stopPlay(){
   clearInterval(playTimer); playTimer = null;
-  $('play').textContent = '▶ Replay'; $('play').classList.remove('on');
+  setBtn($('play'), '▶', 'Replay'); $('play').classList.remove('on');
   followLatest = viewExam === DATA.lastExam;
 }
 
@@ -1097,10 +1427,11 @@ function hideMsg(){ $('msg').classList.add('hidden'); }
 function renderBoard(){
   var medal = ['🥇','🥈','🥉'];
   $('board').innerHTML = sortedModels.map(function(m){
-    var icons = (m.crown ? '👑' : '') + (m.improved ? '✨' : '') + (m.sick ? '🤒' : '') + (m.scar ? '🩹' : '');
-    var dot = m.sick ? 'hsl(85,25%,55%)' : 'hsl(' + m.hue + ',75%,58%)';
-    return '<div class="row' + (m.sick ? ' sick' : '') + '" data-key="' + esc(m.key) + '">' +
-      '<div class="rank">' + (m.rank <= 3 && m.points > 0 ? medal[m.rank-1] : m.rank) + '</div>' +
+    var wear = Object.keys(m.outfit).map(function(sl){ return PERKS[m.outfit[sl]].icon; }).join('');
+    var icons = (m.crown ? '👑' : '') + (m.pb ? '⭐' : '') + (m.improved ? '✨' : '') + TIERS[m.tier].icon + (m.scar ? '🩹' : '') + wear;
+    var dot = m.ill ? 'hsl(85,25%,55%)' : 'hsl(' + m.hue + ',75%,58%)';
+    return '<div class="row' + (m.ill ? ' sick' : '') + '" data-key="' + esc(m.key) + '" title="' + esc(TIERS[m.tier].name + ' · health ' + m.health + '%') + '">' +
+      '<div class="rank">' + (m.rank <= 3 && m.total > 0 ? medal[m.rank-1] : m.rank) + '</div>' +
       '<div class="dot" style="background:' + dot + '"></div>' +
       '<div class="nm">' + esc(m.name) + ' <small>' + STAGES[m.stage].name + '</small> ' + icons + '</div>' +
       '<div class="sc">' + fmt(m.total) + '</div></div>';
@@ -1139,36 +1470,70 @@ function renderCard(){
     '<div class="stat"><b>#' + m.rank + '</b><span>of ' + models.length + '</span></div>' +
     '<div class="stat"><b>' + fmt(m.total) + '</b><span>Total score</span></div>' +
     '<div class="stat"><b>' + (m.avg === null ? '—' : Math.round(m.avg) + '%') + '</b><span>Average</span></div>' +
-    '<div class="stat"><b>' + m.taken.length + '</b><span>Exams taken</span></div>';
+    '<div class="stat"><b>' + m.taken.length + '</b><span>Exams taken</span></div>' +
+    '<div class="hbar"><span>❤️ Health <b>' + m.health + '%</b> · ' + TIERS[m.tier].name + '</span>' +
+    '<div class="bar"><i style="width:' + m.health + '%;background:' + TIERS[m.tier].col + '"></i></div></div>';
   var st = [];
   if (m.crown) st.push('👑 Top of the class!');
+  if (m.pb) st.push('⭐ <b>Personal best</b> on ' + esc(DATA.exams[m.pb.e]) + ': ' + Math.round(m.pb.pct) + '% (previous best ' + Math.round(m.pb.prev) + '%).');
   if (m.improved) st.push('✨ Most improved: +' + Math.round(m.delta) + '% compared with the previous exam.');
-  if (m.sick) st.push('🤒 Feeling sick after scoring 0 on ' + esc(m.zeroExam) + '. Any score above 0 will make this fish feel better.');
-  else if (m.scar) st.push('🩹 Has a scar from a 0 on ' + esc(m.zeroExam) + '. A passing score (' + CFG.passingPercent + '% or higher) will heal it.');
-  else if (m.healed) st.push('💚 Healed! Bounced back from a 0 with a passing score.');
-  if (!m.sick && !m.scar && !m.crown && !m.improved && !m.healed) st.push('😊 Healthy and swimming happily.');
+  healthStory(m).forEach(function(x){ st.push(x); });
+  m.boosts.slice().reverse().forEach(function(b){
+    var pk = PERKS[b.perk];
+    var left = boostLeft(b);
+    st.push((left > 0 ? '⚡ Boost: ' : '<span class="muted">Past boost:</span> ') + pk.icon + ' ' + esc(pk.name) + (b.points ? ' · <b>+' + fmt(b.points) + ' bonus points</b>' : '') +
+      (b.reason ? ' — ' + esc(b.reason) : '') + (b.exam ? ' <span class="muted">(' + esc(b.exam) + ')</span>' : '') +
+      (left > 0 ? ' <span class="muted">· ⏳ ' + fmtLeft(left) + ' left</span>' : ''));
+  });
+  var curved = DATA.exams.map(function(x, e){ return e <= viewExam && DATA.curve[e] && effMax[e] < DATA.max[e] ? esc(x) + ' (top score ' + fmt(effMax[e]) + '/' + fmt(DATA.max[e]) + ' counts as 100%)' : null; }).filter(Boolean);
+  if (curved.length) st.push('<span class="muted">🎚️ Curved: ' + curved.join(', ') + '</span>');
   $('cardStatus').innerHTML = st.map(function(s){ return '<div class="status">' + s + '</div>'; }).join('');
   var exp = Math.max(1, CFG.expectedExams), next = STAGES[m.stage+1];
   if (next){
     var cur = STAGES[m.stage].at, frac = (m.g - cur)/(next.at - cur);
-    var need = Math.ceil(next.at*exp*100 - m.points);
-    $('cardProg').innerHTML = 'Growing toward <b>' + next.name + '</b>: about ' + need + ' more points to go' +
+    var need = Math.max(.1, (next.at*exp*100 - m.points)/100);
+    $('cardProg').innerHTML = 'Growing toward <b>' + next.name + '</b>: about ' + (Math.ceil(need*10)/10) + ' more perfect exam' + (need > 1 ? 's' : '') + ' to go' +
       '<div class="bar"><i style="width:' + Math.round(clamp(frac,0,1)*100) + '%"></i></div>';
   } else {
     $('cardProg').innerHTML = '🌟 Fully grown Legend fish!';
   }
   renderChart(m);
 }
+/* Plain-language explanation of a fish's health, for the student card. */
+function healthStory(m){
+  var out = [], hl = m.hl, L = hl.last, ex = function(e){ return '<b>' + esc(DATA.exams[e]) + '</b>'; };
+  if (L){
+    var d = L.after - L.before;
+    if (L.ev === 'streakLow') out.push('🤢 <b>Very ill</b>: 3 low scores in a row (' + hl.lowExams.map(function(e){ return esc(DATA.exams[e]); }).join(', ') + ').');
+    else if (L.ev === 'zero') out.push('🤒 Got ill after scoring 0 on ' + ex(L.e) + '.');
+    else if (L.ev === 'low') out.push('🤒 Got ill after scoring below half on ' + ex(L.e) + '.');
+    else if (L.ev === 'effort') out.push('💪 Scored below half on ' + ex(L.e) + ', but the effort counts: healed a little (+' + d + '%).');
+    else if (L.ev === 'perfect' && L.before < 100) out.push('🌟 Perfect score on ' + ex(L.e) + ': fully healed!');
+    else if (L.ev === 'excellent' && L.before < 100) out.push('🏆 Excellent score on ' + ex(L.e) + ': fully healed!');
+    else if (L.ev === 'streakGood' && L.before < 100) out.push('🎉 3 good scores in a row: fully healed!');
+    else if (L.ev === 'heal') out.push('💚 Good score on ' + ex(L.e) + ' healed +' + d + '%.');
+  }
+  if (m.health < 100){
+    out.push('🩺 <b>To heal:</b> score half or more (+30% to +80%). An excellent score (' + (Number(CFG.excellentPercent) || 90) + '%+), or 3 scores of half or more in a row, heals completely.' +
+      (hl.goodRun === 2 ? ' <b>One more good score for a full heal!</b>' : ''));
+  }
+  if (hl.lowRun === 2) out.push('⚠️ Two low scores in a row. Another one will make this fish very ill.');
+  if (m.scar) out.push('🩹 Has a scar from a 0 on ' + esc(m.zeroExam) + '. It fades when the fish is back to full health.');
+  if (!out.length && m.taken.length) out.push('😊 Healthy and swimming happily.');
+  return out;
+}
+
 function renderChart(m){
   var svg = $('chart'), n = viewExam + 1;
   if (n <= 0){ svg.innerHTML = '<text x="210" y="80" fill="#93bfdf" font-size="14" text-anchor="middle">No exams yet</text>'; return; }
   var scores = DATA.students[m.i].scores, Wc = 420, Hc = 160, top = 22, bottom = 30, pad = 10;
   var plotH = Hc - top - bottom, slot = (Wc - pad*2)/n, bw = Math.min(38, slot*.66);
-  var passY = top + plotH*(1 - CFG.passingPercent/100);
+  var low = clamp(Number(CFG.illPercent) || 50, 1, 99), passY = top + plotH*(1 - low/100);
   var out = '<line x1="' + pad + '" x2="' + (Wc-pad) + '" y1="' + passY + '" y2="' + passY + '" stroke="#ffd34d" stroke-dasharray="4 4" opacity=".55"/>' +
-    '<text x="' + (Wc-pad) + '" y="' + (passY-4) + '" fill="#ffd34d" font-size="10" text-anchor="end" opacity=".8">passing</text>';
+    '<text x="' + (Wc-pad) + '" y="' + (passY-4) + '" fill="#ffd34d" font-size="10" text-anchor="end" opacity=".8">half</text>' +
+    '<text x="' + pad + '" y="11" fill="#ff8fab" font-size="10.5">— ❤️ health</text>';
   for (var e = 0; e < n; e++){
-    var sc = scores[e], mx = (DATA.max && DATA.max[e]) || 100, cx = pad + slot*(e+.5);
+    var sc = scores[e], mx = effMax[e] || DATA.max[e] || 100, cx = pad + slot*(e+.5);
     var lab = String(DATA.exams[e]); if (lab.length > 9) lab = lab.slice(0,8) + '…';
     out += '<text x="' + cx + '" y="' + (Hc-10) + '" fill="#93bfdf" font-size="10.5" text-anchor="middle">' + esc(lab) + '</text>';
     if (sc === null || sc === undefined){
@@ -1176,9 +1541,14 @@ function renderChart(m){
       continue;
     }
     var pct = clamp(sc/mx*100, 0, 100), h = Math.max(3, plotH*pct/100), y = top + plotH - h;
-    var col = sc === 0 ? '#ff6b6b' : pct >= CFG.passingPercent ? '#4fe0c0' : '#ffb35c';
-    out += '<rect x="' + (cx-bw/2) + '" y="' + y + '" width="' + bw + '" height="' + h + '" rx="5" fill="' + col + '"/>' +
+    var col = sc === 0 ? '#ff6b6b' : pct >= (Number(CFG.excellentPercent) || 90) ? '#4fe0c0' : pct >= low ? '#7fd8ff' : '#ffb35c';
+    out += '<rect x="' + (cx-bw/2) + '" y="' + y + '" width="' + bw + '" height="' + h + '" rx="5" fill="' + col + '" opacity=".9"/>' +
       '<text x="' + cx + '" y="' + (y-5) + '" fill="#ecf7ff" font-size="12" font-weight="600" text-anchor="middle">' + fmt(sc) + '</text>';
+  }
+  var pts = m.hl.hist.map(function(p){ return [pad + slot*(p.e+.5), top + plotH*(1 - p.h/100)]; });
+  if (pts.length){
+    out += '<polyline points="' + pts.map(function(p){ return p.join(','); }).join(' ') + '" fill="none" stroke="#ff8fab" stroke-width="2.5" stroke-linejoin="round"/>';
+    pts.forEach(function(p, j){ out += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4" fill="' + TIERS[tierOf(m.hl.hist[j].h)].col + '" stroke="#2a0d1a" stroke-width="1.2"/>'; });
   }
   svg.innerHTML = out;
 }
@@ -1234,7 +1604,7 @@ function enterTeacher(pin){
   if (playTimer) stopPlay();
   followLatest = true; viewExam = DATA.lastExam; syncExamControls(); recompute();
   closeCard();
-  $('teachBtn').textContent = '🔓 Exit teacher'; $('teachBtn').classList.add('on');
+  setBtn($('teachBtn'), '🔓', 'Exit teacher'); $('teachBtn').classList.add('on');
   $('boardView').classList.add('hidden'); $('feedView').classList.remove('hidden');
   $('side').classList.remove('hidden'); $('boardBtn').classList.add('on');
   $('sectionCtl').style.display = '';
@@ -1245,7 +1615,7 @@ function enterTeacher(pin){
 function exitTeacher(msg){
   if (!teacher.on) return;
   teacher.on = false; teacher.pin = null;
-  $('teachBtn').textContent = '🔒 Teacher'; $('teachBtn').classList.remove('on');
+  setBtn($('teachBtn'), '🔒', 'Teacher'); $('teachBtn').classList.remove('on');
   $('feedView').classList.add('hidden'); $('boardView').classList.remove('hidden');
   $('feedList').innerHTML = '';
   $('sectionCtl').style.display = DATA && DATA.sections.length > 1 ? '' : 'none';
@@ -1271,21 +1641,30 @@ function defaultFeedExam(){
 function renderFeed(){
   var sel = $('feedExam');
   if (!DATA.exams.length){
-    sel.innerHTML = '<option>No exams yet</option>'; sel.disabled = true;
+    sel.innerHTML = '<option>No exams yet</option>'; sel.disabled = true; $('curveRow').style.display = 'none';
     $('feedList').innerHTML = '<div class="empty">' + (DATA.students.length ? 'Click <b>➕ New exam</b> to start feeding.' : 'Add your class first with <b>👥 Students</b>, then click <b>➕ New exam</b>.') + '</div>';
     $('feedCount').textContent = '';
     return;
   }
   sel.disabled = false;
+  $('curveRow').style.display = '';
+  $('curveChk').checked = !!DATA.curve[feedExam];
+  updateCurveInfo();
   sel.innerHTML = DATA.exams.map(function(x, i){ return '<option value="' + i + '"' + (i === feedExam ? ' selected' : '') + '>' + esc(x) + ' (out of ' + fmt(DATA.max[i] || 100) + ')</option>'; }).join('');
   var mx = DATA.max[feedExam] || 100;
   $('feedList').innerHTML = DATA.students.length ? DATA.students.map(function(s, i){
     var v = s.scores[feedExam];
     return '<div class="frow" data-i="' + i + '"><span class="num">' + (i+1) + '</span><span class="nm">' + esc(s.name) + '</span>' +
       '<input type="text" inputmode="decimal" autocomplete="off" data-i="' + i + '" value="' + (v === null || v === undefined ? '' : v) + '">' +
-      '<span class="mx">/ ' + fmt(mx) + '</span><span class="st"></span></div>';
+      '<span class="mx">/ ' + fmt(mx) + '</span><span class="st"></span>' +
+      '<button class="bst' + (boostCount(s.name) ? ' has' : '') + '" data-boost="' + i + '" title="Give ' + esc(s.name) + ' a boost">⚡</button></div>';
   }).join('') : '<div class="empty">No students yet. Click <b>👥 Students</b> to add your class.</div>';
   renderFeedCount();
+}
+function updateCurveInfo(){
+  if (feedExam < 0 || !DATA.exams[feedExam]) return;
+  computeEffMax();
+  $('curveInfo').textContent = DATA.curve[feedExam] ? '(top: ' + fmt(effMax[feedExam]) + ' = 100%)' : '';
 }
 function renderFeedCount(){
   if (feedExam < 0 || !DATA.exams[feedExam]) { $('feedCount').textContent = ''; return; }
@@ -1293,6 +1672,91 @@ function renderFeedCount(){
   $('feedCount').textContent = '🐟 ' + n + ' of ' + DATA.students.length + ' fed for ' + DATA.exams[feedExam];
 }
 $('feedExam').addEventListener('change', function(){ feedExam = +this.value; renderFeed(); });
+$('curveChk').addEventListener('change', function(){
+  var chk = this, on = chk.checked, exam = DATA.exams[feedExam];
+  chk.disabled = true;
+  api('setCurve', teacher.pin, DATA.section, exam, on).then(function(d){
+    chk.disabled = false; onData(d);
+    toast(on ? '🎚️ ' + exam + ' is now curved: the top score counts as perfect.' : exam + ' is no longer curved.');
+  }).catch(function(e){ chk.disabled = false; chk.checked = !on; handleTeacherError(e); });
+});
+$('feedList').addEventListener('click', function(e){
+  var b = e.target.closest('[data-boost]');
+  if (b){ var s = DATA.students[+b.getAttribute('data-boost')]; if (s) openBoost(s.name); }
+});
+function boostCount(name){ return (DATA.boosts || []).filter(function(b){ return b.student === name && boostLeft(b) > 0; }).length; }
+
+/* boosts: give a fish an outfit (and optional bonus points) */
+function openBoost(name){
+  var mine = (DATA.boosts || []).filter(function(b){ return b.student === name; });
+  var exam = feedExam >= 0 ? DATA.exams[feedExam] : '';
+  var picked = 'tophat';
+  var list = mine.slice().reverse().map(function(b){
+    var pk = PERKS[b.perk];
+    return '<div class="srow"><span>' + pk.icon + ' ' + esc(pk.name) + (b.points ? ' · +' + fmt(b.points) + ' pts' : '') +
+      (b.reason ? ' <span class="muted">— ' + esc(b.reason) + '</span>' : '') + (b.exam ? ' <span class="muted">(' + esc(b.exam) + ')</span>' : '') +
+      ' <span class="muted">' + (boostLeft(b) > 0 ? '⏳ ' + fmtLeft(boostLeft(b)) : 'faded') + '</span></span>' +
+      '<button data-rmb="' + esc(b.id) + '">Remove</button></div>';
+  }).join('');
+  openModal('<h3>⚡ Boost ' + esc(name) + '</h3>' +
+    '<p>For students who earned extra points or did something great. Their fish wears the outfit for <b>6 hours</b>, then it fades away. Bonus points stay for good.</p>' +
+    '<div class="perks">' + Object.keys(PERKS).map(function(k){
+      return '<button class="perk' + (k === picked ? ' sel' : '') + '" data-perk="' + k + '"><b>' + PERKS[k].icon + '</b>' + esc(PERKS[k].name) + '</button>';
+    }).join('') + '</div>' +
+    '<div class="grid2"><div><label>Bonus points (optional)</label><input type="number" id="bPts" min="0" max="1000" placeholder="0"></div>' +
+    '<div><label>Linked to exam</label><input type="text" value="' + esc(exam || 'none yet') + '" disabled></div></div>' +
+    '<label>Reason (optional, shown on the student card)</label><input type="text" id="bWhy" maxlength="120" placeholder="Extra project, helped classmates, perfect attendance…">' +
+    '<p style="font-size:13px">Bonus points are added to the total score and help the fish grow. They do not change health.</p>' +
+    '<div class="err" id="bErr"></div><div class="actions"><button id="bCancel">Cancel</button><button class="primary" id="bGo">⚡ Give boost</button></div>' +
+    (list ? '<label>Boosts already given</label><div class="slist">' + list + '</div>' : ''), function(b){
+      b.querySelector('#bCancel').onclick = closeModal;
+      Array.prototype.forEach.call(b.querySelectorAll('[data-perk]'), function(btn){
+        btn.onclick = function(){
+          picked = btn.getAttribute('data-perk');
+          Array.prototype.forEach.call(b.querySelectorAll('[data-perk]'), function(x){ x.classList.toggle('sel', x === btn); });
+        };
+      });
+      var go = b.querySelector('#bGo');
+      go.onclick = function(){
+        var pts = b.querySelector('#bPts').value.trim();
+        if (pts !== '' && !(Number(pts) >= 0 && Number(pts) <= 1000)){ b.querySelector('#bErr').textContent = 'Bonus points must be a number from 0 to 1000.'; return; }
+        busy(go, true, 'Giving…');
+        api('addBoost', teacher.pin, DATA.section, name, picked, pts === '' ? 0 : Number(pts), b.querySelector('#bWhy').value, exam).then(function(d){
+          closeModal(); onData(d);
+          toast('⚡ ' + name + ' got a ' + PERKS[picked].name + (Number(pts) ? ' and +' + fmt(Number(pts)) + ' bonus points' : '') + '!');
+        }).catch(function(e){ if (isAuthErr(e)) return handleTeacherError(e); b.querySelector('#bErr').textContent = errText(e); busy(go, false, '⚡ Give boost'); });
+      };
+      Array.prototype.forEach.call(b.querySelectorAll('[data-rmb]'), function(btn){
+        btn.onclick = function(){
+          if (!btn.classList.contains('danger')){ btn.classList.add('danger'); btn.textContent = 'Sure?'; return; }
+          busy(btn, true, 'Removing…');
+          api('removeBoost', teacher.pin, DATA.section, btn.getAttribute('data-rmb')).then(function(d){ onData(d); openBoost(name); })
+            .catch(function(e){ handleTeacherError(e); busy(btn, false, 'Remove'); });
+        };
+      });
+    });
+}
+
+/* "How fish health works" — for students and teachers */
+$('rulesLink').addEventListener('click', function(){
+  var h = clamp(Number(CFG.illPercent) || 50, 1, 99) + '%';
+  openModal('<h3>❤️ How fish health works</h3>' +
+    '<p>Every fish has health from 0% to 100%. A <b>low score</b> means below half (' + h + ') of the perfect score.</p>' +
+    '<ul class="rules">' +
+    '<li>🤒 <b>Getting ill:</b> a healthy fish that scores 0 or a low score becomes ill.</li>' +
+    '<li>🤢 <b>Very ill:</b> 3 low scores in a row make the fish very ill.</li>' +
+    '<li>💪 <b>Effort counts:</b> a low score (not 0) while already ill still heals a little (+20% to +25%), but the fish stays ill until it gets a good score.</li>' +
+    '<li>💚 <b>Good score:</b> half or more heals +30% to +80%. The higher the score, the bigger the heal.</li>' +
+    '<li>🏆 <b>Excellent score</b> (' + (Number(CFG.excellentPercent) || 90) + '% or more): heals completely. You don\'t need a perfect score! A perfect score still gets a 🌟.</li>' +
+    '<li>🎉 <b>3 good scores in a row</b> (half or more): heals completely.</li>' +
+    '<li>🟰 <b>Exactly half</b> counts as a good score.</li>' +
+    '<li>🩹 <b>Scar:</b> a 0 leaves a scar that fades once the fish is back to full health.</li>' +
+    '<li>⭐ <b>Personal best:</b> beat your own best score and your fish shines with a star.</li>' +
+    '<li>🎚️ <b>Curved exams:</b> on hard exams your teacher can make the top score in class count as 100%.</li>' +
+    '<li>⚡ <b>Boosts:</b> your teacher can reward extra effort with an outfit (lasts 6 hours) and bonus points (kept for good).</li>' +
+    '</ul><p>Health shows how you are doing lately. Your fish\'s <b>size</b> comes from your total score, so it never shrinks.</p>' +
+    '<div class="actions"><button class="primary" id="rOk">Got it</button></div>', function(b){ b.querySelector('#rOk').onclick = closeModal; });
+});
 $('feedList').addEventListener('keydown', function(e){
   var inp = e.target; if (inp.tagName !== 'INPUT') return;
   if (e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'ArrowUp'){
@@ -1387,12 +1851,13 @@ $('newExamBtn').addEventListener('click', function(){
   openModal('<h3>➕ New exam</h3><p>This adds a new column for <b>' + esc(DATA.section) + '</b> in your Google Sheet.</p>' +
     '<label>Exam name</label><input type="text" id="exName" value="Quiz ' + n + '">' +
     '<label>Perfect score</label><input type="number" id="exMax" value="100" min="1">' +
+    '<label class="check"><input type="checkbox" id="exCurve"> 🎚️ Grade on a curve: the top score in the class counts as perfect (good for hard exams). You can change this later.</label>' +
     '<div class="err" id="exErr"></div><div class="actions"><button id="exCancel">Cancel</button><button class="primary" id="exGo">Create exam</button></div>', function(b){
       var go = b.querySelector('#exGo');
       b.querySelector('#exCancel').onclick = closeModal;
       function submit(){
         busy(go, true, 'Creating…');
-        api('addExam', teacher.pin, DATA.section, b.querySelector('#exName').value, b.querySelector('#exMax').value).then(function(d){
+        api('addExam', teacher.pin, DATA.section, b.querySelector('#exName').value, b.querySelector('#exMax').value, b.querySelector('#exCurve').checked).then(function(d){
           closeModal(); feedExam = d.exams.length - 1; onData(d); renderFeed(); focusFeed(0);
           toast('Exam created. Time to feed the fish! 🍤');
         }).catch(function(e){ if (/WRONG_PIN|NO_PIN/.test(String(e && e.message))) return handleTeacherError(e); b.querySelector('#exErr').textContent = errText(e); busy(go, false, 'Create exam'); });
@@ -1471,7 +1936,8 @@ $('setBtn').addEventListener('click', function(){
   openModal('<h3>⚙️ Settings</h3><p>These apply to all sections.</p>' +
     '<label>Title shown on the tank</label><input type="text" id="sTitle" value="' + esc(CFG.className) + '">' +
     '<div class="grid2"><div><label>Exams planned this term</label><input type="number" id="sExp" min="1" value="' + CFG.expectedExams + '"></div>' +
-    '<div><label>Passing score (%)</label><input type="number" id="sPass" min="1" max="100" value="' + CFG.passingPercent + '"></div></div>' +
+    '<div><label>"Half" line for low scores (%)</label><input type="number" id="sPass" min="1" max="99" value="' + CFG.illPercent + '"></div>' +
+    '<div><label>"Excellent" line, full heal (%)</label><input type="number" id="sExc" min="2" max="100" value="' + CFG.excellentPercent + '"></div></div>' +
     '<p style="font-size:13px;margin-top:6px">A student with perfect scores becomes a Legend fish after about 70% of the planned exams.</p>' +
     '<label class="check"><input type="checkbox" id="sNick"' + (CFG.showFishNames ? ' checked' : '') + '> Label fish with their fish names instead of student names</label>' +
     '<div class="err" id="sErr"></div><div class="actions"><button id="sCancel">Cancel</button><button class="primary" id="sSave">Save</button></div>' +
@@ -1484,7 +1950,7 @@ $('setBtn').addEventListener('click', function(){
         busy(save, true, 'Saving…');
         api('saveSettings', teacher.pin, DATA.section, {
           className: b.querySelector('#sTitle').value, expectedExams: b.querySelector('#sExp').value,
-          passingPercent: b.querySelector('#sPass').value, refreshSeconds: CFG.refreshSeconds,
+          illPercent: b.querySelector('#sPass').value, excellentPercent: b.querySelector('#sExc').value, refreshSeconds: CFG.refreshSeconds,
           showFishNames: b.querySelector('#sNick').checked
         }).then(function(d){ closeModal(); onData(d); toast('Settings saved.'); })
           .catch(function(e){ if (/WRONG_PIN|NO_PIN/.test(String(e && e.message))) return handleTeacherError(e); b.querySelector('#sErr').textContent = errText(e); busy(save, false, 'Save'); });
@@ -1506,7 +1972,7 @@ var MOCK = (function(){
     function r(){ seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0)/4294967296; }
     var exams = examNames.slice(0, filled);
     var students = names.map(function(n){
-      var ab = 40 + r()*58;
+      var ab = 58 + r()*40;
       return { name:n, nick:'', scores: exams.map(function(_, e){
         if (r() < .03) return null;
         if (r() < .035) return 0;
@@ -1520,17 +1986,34 @@ var MOCK = (function(){
   var f2 = ['Lia','Marco','Nina','Oscar','Pia','Rafa','Sofia','Tomas','Uma','Vince','Wendy','Yna','Zeke','Abby','Bryan','Clara','Diego','Erika','Fritz','Grace','Hugo','Ivy','Jules','Kim','Luis','Mara','Noel','Odette','Pat','Rey'];
   var ex = ['Quiz 1','Quiz 2','Long Test 1','Quiz 3','Quiz 4','Long Test 2'];
   var a = demoSection(20261028, f1.map(function(f, i){ return last[i % 16] + ', ' + f; }), 6, ex);
-  a.students[3].scores[5] = 0;
+  a.students[3].scores  = [70, 65, 30, 20, 10, 0];       // 3+ low in a row: very ill
+  a.students[15].scores = [90, 85, 0, 60, null, null];    // 0 then a good score: recovering, scar
+  a.students[18].scores = [85, 80, 90, 75, 92, 30];       // one low score: ill
+  a.students[22].scores = [75, 40, 45, null, 30, 28];     // low streak across an absence: very ill
+  a.students[26].scores = [80, 70, 35, 42, null, null];   // low then "effort" heal: recovering
   a.students[7].scores = [68, 0, 62, 70, 66, 71];
   a.students[11].scores = [80, 0, 91, 88, 93, 90];
   var b = demoSection(4242, f2.map(function(f, i){ return last[(i*5) % 16] + ', ' + f; }), 4, ex);
-  var store = { pin:'1234', settings:{ className:'Class Aquarium', expectedExams:8, passingPercent:75, refreshSeconds:60, showFishNames:false },
+  a.curve = a.exams.map(function(x){ return x === 'Long Test 1'; });        // demo: a hard, curved exam
+  a.students.forEach(function(s){ if (s.scores[2] !== null) s.scores[2] = Math.round(s.scores[2]*.78); });
+  b.curve = b.exams.map(function(){ return false; });
+  var store = { pin:'1234', settings:{ className:'Class Aquarium', expectedExams:8, illPercent:50, excellentPercent:90, refreshSeconds:60, showFishNames:false },
     order:['Grade 7 – Sampaguita','Grade 7 – Rosal'], sections:{ 'Grade 7 – Sampaguita':a, 'Grade 7 – Rosal':b } };
+  a.boosts = [
+    { id:'d1', student:a.students[0].name, perk:'tophat', points:5, reason:'Extra credit project', exam:'Quiz 3', hAgo:1 },
+    { id:'d2', student:a.students[0].name, perk:'shades', points:0, reason:'Helped classmates', exam:'Long Test 2', hAgo:2 },
+    { id:'d3', student:a.students[5].name, perk:'cape', points:3, reason:'Science fair', exam:'Quiz 4', hAgo:3 },
+    { id:'d4', student:a.students[9].name, perk:'gradcap', points:0, reason:'Perfect attendance', exam:'Long Test 1', hAgo:5.6 },
+    { id:'d5', student:a.students[14].name, perk:'medal', points:2, reason:'Reading challenge', exam:'Long Test 2', hAgo:.5 },
+    { id:'d6', student:a.students[20].name, perk:'bow', points:0, reason:'Class helper', exam:'Quiz 2', hAgo:30 },
+    { id:'d7', student:a.students[25].name, perk:'party', points:4, reason:'Bonus quiz', exam:'Long Test 2', hAgo:4 }
+  ].map(function(x){ x.at = Date.now() - x.hAgo*3600e3; x.date = ''; delete x.hAgo; return x; });
+  b.boosts = [];
   function chk(pin){ if (pin !== store.pin) throw new Error('WRONG_PIN: Wrong PIN.'); }
   function sec(name){ var s = store.sections[name]; if (!s) throw new Error('Section not found.'); return s; }
   function getData(section){
     var n = store.sections[section] ? section : store.order[0], s = store.sections[n];
-    return { settings:store.settings, hasPin:true, sections:store.order.slice(), section:n, exams:s.exams, max:s.max, students:s.students, lastExam:0 };
+    return { settings:store.settings, hasPin:true, sections:store.order.slice(), section:n, exams:s.exams, max:s.max, students:s.students, lastExam:0, boosts:s.boosts, curve:s.curve, serverNow:Date.now() };
   }
   return {
     getData:getData,
@@ -1545,12 +2028,12 @@ var MOCK = (function(){
         st.scores[e] = it.value; return { ok:true };
       });
     },
-    addExam:function(pin, section, name, max){
+    addExam:function(pin, section, name, max, curve){
       chk(pin); var s = sec(section); name = String(name).trim(); max = Number(max);
       if (!name) throw new Error('Please give the exam a name.');
       if (!(max > 0)) throw new Error('The perfect score must be more than 0.');
       if (s.exams.some(function(x){ return x.toLowerCase() === name.toLowerCase(); })) throw new Error('There is already an exam called "' + name + '".');
-      s.exams.push(name); s.max.push(max); s.students.forEach(function(x){ x.scores.push(null); });
+      s.exams.push(name); s.max.push(max); s.curve.push(!!curve); s.students.forEach(function(x){ x.scores.push(null); });
       return getData(section);
     },
     addStudents:function(pin, section, items){
@@ -1564,19 +2047,38 @@ var MOCK = (function(){
     removeStudent:function(pin, section, name){
       chk(pin); var s = sec(section);
       s.students = s.students.filter(function(x){ return x.name !== name; });
+      s.boosts = s.boosts.filter(function(x){ return x.student !== name; });
+      return getData(section);
+    },
+    addBoost:function(pin, section, name, perk, points, reason, exam){
+      chk(pin); var s = sec(section);
+      if (!PERKS[perk]) throw new Error('Please choose a perk.');
+      if (!s.students.some(function(x){ return x.name === name; })) throw new Error('Student not found. Try reloading.');
+      s.boosts.push({ id:'b' + Date.now() + Math.random(), student:name, perk:perk, points:Number(points) || 0,
+        reason:String(reason || '').slice(0, 120), exam: s.exams.indexOf(exam) >= 0 ? exam : '', date:new Date().toLocaleString(), at:Date.now() });
+      return getData(section);
+    },
+    setCurve:function(pin, section, exam, on){
+      chk(pin); var s = sec(section), e = s.exams.indexOf(exam);
+      if (e < 0) throw new Error('Exam not found. Try reloading.');
+      s.curve[e] = !!on; return getData(section);
+    },
+    removeBoost:function(pin, section, id){
+      chk(pin); var s = sec(section);
+      s.boosts = s.boosts.filter(function(x){ return x.id !== id; });
       return getData(section);
     },
     addSection:function(pin, name){
       chk(pin); name = String(name).trim();
       if (!name) throw new Error('Please give the section a name.');
       if (store.sections[name]) throw new Error('There is already a section called "' + name + '".');
-      store.sections[name] = { exams:[], max:[], students:[] }; store.order.push(name);
+      store.sections[name] = { exams:[], max:[], curve:[], students:[], boosts:[] }; store.order.push(name);
       return getData(name);
     },
     saveSettings:function(pin, section, s){
       chk(pin);
       store.settings = { className:String(s.className || 'Class Aquarium'), expectedExams:Math.max(1, +s.expectedExams || 10),
-        passingPercent:clamp(+s.passingPercent || 75, 1, 100), refreshSeconds:60, showFishNames:!!s.showFishNames };
+        illPercent:clamp(+s.illPercent || 50, 1, 99), excellentPercent:clamp(+s.excellentPercent || 90, 2, 100), refreshSeconds:60, showFishNames:!!s.showFishNames };
       return getData(section);
     },
     changePin:function(pin, np){ chk(pin); if (!/^\S{4,20}$/.test(np)) throw new Error('The PIN must be 4 to 20 characters with no spaces.'); store.pin = np; return true; }
@@ -1584,6 +2086,10 @@ var MOCK = (function(){
 })();
 
 /* ---------- start ---------- */
+if (isNarrow()){ $('side').classList.add('hidden'); $('boardBtn').classList.remove('on'); }   // phones: board opens on demand
+setInterval(function(){                    // let boosts fade and expire on time, even with no new data
+  if (DATA && !playTimer && (DATA.boosts || []).some(function(b){ var l = boostLeft(b); return l > -120000 && l < BOOST_MS; })) recompute();
+}, 60000);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ fishes.forEach(function(f){ f.lblKey = null; }); });
 new ResizeObserver(resize).observe($('tankWrap'));
 resize();
