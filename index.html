@@ -732,10 +732,12 @@ Fish.prototype.update = function(dt){
   this.chomp = Math.max(0, this.chomp - dt*1.5);
   var max = (34 + 26*this.spd) * SC * [1, .8, .4, .22][m.tier] * (m.stage === 0 ? 1.15 : 1);
   var hungry = this.food && !this.food.eaten && this.food.age > .35;   // a moment to notice the snack
-  if (hungry){ this.tx = this.food.x; this.ty = this.food.y; max = Math.max(max*2.2, 135*SC); }
+  // aim a little ahead of the sinking snack, and swim faster than it falls so it can't slip past
+  if (hungry){ this.tx = this.food.x; this.ty = Math.min(this.food.y + this.food.vy*.35, H*.86 - 6); max = Math.max(max*2.2, 200*SC); }
   var dx = this.tx - this.x, dy = this.ty - this.y, d = Math.hypot(dx,dy) || 1;
   if (hungry){
-    if (d < this.size*.45 + 10*SC) eatFood(this.food, this);
+    var fd0 = this.food, dfx = fd0.x - this.x, dfy = fd0.y - this.y;
+    if (Math.hypot(dfx, dfy) < this.size*.5 + 14*SC) eatFood(fd0, this);
   } else if (d < 25*SC) this.newTarget();
   var k = Math.min(1, dt*(hungry ? 2 : .9));
   this.vx += (dx/d*max - this.vx) * k;
@@ -1069,10 +1071,10 @@ function dropFood(name, e, val){
   var f = fishByName(name);
   computeEffMax();
   var mx = effMax[e] || DATA.max[e] || 100;
-  // the snack appears well above its fish and visibly sinks; the fish notices it, then darts up
-  // to catch it (about 1.5 s in total, even for a fish resting on the sand)
+  // every snack drops in from the very top of the tank, right above its fish, and sinks;
+  // the fish notices it, then swims up to catch it
   var fd = { name:name, e:e, val:val, kind:foodKind(val/mx*100), x: f ? clamp(f.x + rnd(-60,60)*SC, 30, W-30) : W/2,
-    y: f ? Math.max(-12, f.y - 260*SC) : -12, vy:55*SC, age:0, rot:rnd(0,6), eaten:false, section: DATA.section };
+    y:-12, vy:70*SC, age:0, rot:rnd(0,6), eaten:false, section: DATA.section };
   foods.push(fd);
   if (f){ if (f.food && !f.food.eaten) eatFood(f.food, null); f.food = fd; }
   else eatFood(fd, null);
@@ -1770,7 +1772,7 @@ function drawFrame(now){
     renderScene(t, dt);
     drawCreatures(ctx, t, dt);
     foods.slice().forEach(function(fd){
-      fd.age += dt; fd.vy = Math.min(fd.vy + 70*SC*dt, 90*SC); fd.y += fd.vy*dt; fd.x += Math.sin(fd.age*2 + fd.rot)*.4;
+      fd.age += dt; fd.vy = Math.min(fd.vy + 140*SC*dt, 170*SC); fd.y += fd.vy*dt; fd.x += Math.sin(fd.age*2 + fd.rot)*.4;
       var gy = sandY(fd.x) - 8*SC; if (fd.y > gy) fd.y = gy;
       if (fd.age > 9) eatFood(fd, fishByName(fd.name));
       else drawFood(ctx, fd, t);
