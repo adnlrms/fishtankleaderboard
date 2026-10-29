@@ -6,7 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Class Aquarium</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 :root{
   --panel:rgba(5,28,54,.92);
@@ -69,6 +70,20 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
 .feedTop select{flex:1;min-width:0}
 #feedCount{padding:0 18px 8px;font-size:13px;color:var(--gold)}
 .frow{display:grid;grid-template-columns:22px 1fr 62px 36px 18px 30px;align-items:center;gap:5px;padding:4px 8px;border-radius:10px;font-size:15px}
+.qpill{gap:7px;max-width:340px}
+.qpill span.t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qpill .bar{width:70px;flex:none}
+.badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:99px;background:var(--bad);color:#fff;font-size:11.5px;font-weight:700;line-height:18px;text-align:center}
+.att{display:flex;flex-direction:column;gap:6px;max-height:55vh;overflow:auto}
+.attRow{text-align:left;border-radius:12px;padding:8px 12px;display:block;width:100%}
+.attRow b{font-size:15px}
+.attRow div{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4}
+.attRow.sev3{border-color:var(--bad)} .attRow.sev2{border-color:var(--warn)}
+.creatures{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
+.qrow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;font-size:14px}
+.qrow span{flex:1;min-width:0}
+.qrow button{font-size:13px;padding:3px 10px}
+#sndBtn.on{border-color:var(--good)}
 .curveRow{display:flex;align-items:center;gap:8px;padding:0 18px 8px;font-size:13.5px;cursor:pointer}
 .curveRow input{width:18px;height:18px;accent-color:var(--gold)}
 .frow .bst{width:30px;height:30px;padding:0;font-size:14px;border-radius:50%}
@@ -136,6 +151,8 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
 @media (max-width:1100px){#side{width:300px}.row{font-size:14px}.frow{font-size:14px;grid-template-columns:22px 1fr 62px 18px 30px}.frow .mx{display:none}}
 /* phones (and small tablets in portrait): side panel becomes a bottom sheet, buttons become icons */
 @media (max-width:760px){
+  .qpill:not(:first-of-type){display:none}
+  .qpill{max-width:200px}
   #topbar{top:8px;left:8px;right:8px;gap:6px}
   #title{flex-basis:100%;font-size:21px}
   #title small{font-size:12px}
@@ -198,12 +215,14 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
       <button id="play" title="Watch the class grow exam by exam">▶<span class="lbl"> Replay</span></button>
       <button id="labels" class="on" title="Show/hide names (L)">🏷️<span class="lbl"> Names</span></button>
       <button id="boardBtn" class="on" title="Show/hide the side panel (B)">🏆<span class="lbl"> Board</span></button>
+      <button id="sndBtn" title="Sound on/off (M)">🔇</button>
       <button id="fs" title="Full screen (F)">⛶</button>
       <button id="teachBtn" title="Teacher mode: feed the fish (enter scores)">🔒<span class="lbl"> Teacher</span></button>
     </div>
     <div id="bottombar">
       <div class="pill" id="avgPill">Class average —</div>
       <div class="pill" id="unlockPill">—</div>
+      <span id="questPills" style="display:contents"></span>
       <div class="pill" id="updated" style="margin-left:auto">—</div>
     </div>
     <div id="card" class="hidden">
@@ -230,7 +249,7 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
         👑 Top &nbsp; ⭐ Personal best &nbsp; ✨ Most improved &nbsp; ⚡ Boosted<br>
         💊 Recovering &nbsp; 🤒 Ill &nbsp; 🤢 Very ill &nbsp; 🩹 Scar<br>
         Fry → Juvenile → Adult → Legend<br>
-        <a id="rulesLink">❤️ How fish health works</a>
+        🐋 Class quest creatures &nbsp;·&nbsp; <a id="rulesLink">❤️ How fish health works</a>
       </div>
     </div>
     <div class="view hidden" id="feedView">
@@ -244,6 +263,9 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
         <button id="stuBtn">👥 Students</button>
         <button id="secBtn">🏫 Sections</button>
         <button id="setBtn">⚙️ Settings</button>
+        <button id="xlsBtn" title="Download this section's exam scores as an Excel file">📥 Excel</button>
+        <button id="questBtn" title="Class quests: a class goal that brings a sea creature to the tank">🐋 Quests</button>
+        <button id="attBtn" title="Students who may need help">🚩 Attention<span class="badge" id="attBadge" hidden></span></button>
       </div>
     </div>
   </aside>
@@ -257,13 +279,13 @@ input[type=range]{accent-color:var(--gold);width:clamp(110px,14vw,200px);cursor:
    or in the sheet: 🐠 Aquarium → Show the aquarium link.
    Leave it empty to see the demo.
    ================================================================ */
-var API_URL = 'https://script.google.com/macros/s/AKfycbw0YtErhMYLfH-8sxyuztph_zwjJ0o7Buuxii6oqsyutntBvydA6M00qqaQ1NK0T89b/exec';
+var API_URL = 'https://script.google.com/macros/s/AKfycbzP0n2QJ5RSDufzkMZAu8g1FZJidIk_cL1pUWBpuYguYNGq5799Hr0pafCpd_iMuJyA/exec';
 </script>
 <script>
 (function(){
 'use strict';
 
-var DEFAULTS = { className:'Class Aquarium', expectedExams:10, illPercent:50, excellentPercent:90, refreshSeconds:60, showFishNames:false };
+var DEFAULTS = { className:'Class Aquarium', expectedExams:10, illPercent:50, excellentPercent:90, refreshSeconds:60, showFishNames:false, seasonal:true };
 var STAGES = [ {name:'Fry',at:0}, {name:'Juvenile',at:.15}, {name:'Adult',at:.40}, {name:'Legend',at:.70} ];
 
 /* Health tiers (health is 0–100%) */
@@ -431,7 +453,9 @@ function fetchApi(fn, args, retries){
 var loadSeq = 0;
 function load(){
   var my = ++loadSeq;
-  return api('getData', currentSection).then(function(d){
+  // tell the server which version we already have; if nothing changed it answers with a tiny "unchanged"
+  var since = (DATA && DATA.ver && currentSection && DATA.section === currentSection) ? DATA.ver : '';
+  return api('getData', currentSection, since).then(function(d){
     if (my === loadSeq) onData(d);     // ignore answers that arrive after a newer request
   }).catch(function(e){
     if (my !== loadSeq) return;
@@ -440,12 +464,35 @@ function load(){
   });
 }
 
+/* A copy of the last data is kept on this device, so the tank appears instantly next time
+   (then quietly refreshes). Only a convenience: if storage is blocked, nothing breaks. */
+function snapKey(sec){ return 'aquarium|' + (gas ? 'gas' : apiUrl) + '|' + (sec || ''); }
+function saveSnap(d){
+  if (!live) return;
+  try { var j = JSON.stringify(d); localStorage.setItem(snapKey(d.section), j); localStorage.setItem(snapKey(''), j); } catch (e) {}
+}
+function loadSnap(sec){
+  if (!live) return null;
+  try { var j = localStorage.getItem(snapKey(sec)); return j ? JSON.parse(j) : null; } catch (e) { return null; }
+}
+function markUpdated(){ $('updated').textContent = (live ? 'Updated ' : 'Demo · ') + new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'}); }
+
 function onData(d){
+  if (d && d.unchanged){                       // nothing changed since last time: no redraw needed
+    loadSeq++;
+    if (Number(d.serverNow) > 0) clockSkew = Number(d.serverNow) - Date.now();
+    if (DATA) DATA.ver = d.ver;
+    hideMsg(); markUpdated();
+    return;
+  }
   if (!d || !Array.isArray(d.students) || !Array.isArray(d.exams)) { toast('⚠ The sheet returned unexpected data.'); return; }
+  if (!d.fromSnap) saveSnap(d);
   loadSeq++;   // any older getData still in flight is now stale
   d.sections = Array.isArray(d.sections) && d.sections.length ? d.sections : [d.section || 'Class'];
   d.max = d.exams.map(function(_, i){ var m = d.max && Number(d.max[i]); return m > 0 ? m : 100; });
   d.curve = d.exams.map(function(_, i){ return !!(d.curve && d.curve[i]); });
+  d.quests = (Array.isArray(d.quests) ? d.quests : []).filter(function(q){ return q && CREATURES[q.creature] && (q.goal === 'pass' || q.goal === 'average'); })
+    .map(function(q){ return { id:String(q.id), creature:q.creature, goal:q.goal, exam:String(q.exam || ''), target:Number(q.target) || 1, at:Number(q.at) || 0, pending:!!q.pending }; });
   d.students.forEach(function(s){
     s.name = String(s.name); s.nick = s.nick ? String(s.nick) : '';
     s.scores = d.exams.map(function(_, i){ var v = s.scores && s.scores[i]; return (v === null || v === undefined || v === '' || !isFinite(Number(v))) ? null : Number(v); });
@@ -453,10 +500,10 @@ function onData(d){
   d.boosts = (Array.isArray(d.boosts) ? d.boosts : []).filter(function(b){ return b && PERKS[b.perk] && b.student; })
     .map(function(b){ return { id:String(b.id), student:String(b.student), perk:b.perk, points:Math.max(0, Number(b.points) || 0),
       reason:String(b.reason || ''), exam:String(b.exam || ''), date:String(b.date || ''), at:Number(b.at) || 0 }; });
-  if (Number(d.serverNow) > 0) clockSkew = Number(d.serverNow) - Date.now();
+  if (Number(d.serverNow) > 0 && !d.fromSnap) clockSkew = Number(d.serverNow) - Date.now();
   hideMsg();
   var sectionChanged = DATA && DATA.section !== d.section;
-  if (sectionChanged){ flushFoods(); fishes.clear(); closeCard(); }
+  if (sectionChanged){ flushFoods(); fishes.clear(); creatures.clear(); questsReady = false; closeCard(); }
   DATA = d;
   currentSection = d.section;
   CFG = Object.assign({}, DEFAULTS, d.settings || {});
@@ -468,7 +515,7 @@ function onData(d){
   updateLast();
   if (followLatest || viewExam > DATA.lastExam || sectionChanged) viewExam = DATA.lastExam;
   syncExamControls();
-  $('updated').textContent = (live ? 'Updated ' : 'Demo · ') + new Date().toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  if (d.fromSnap) $('updated').textContent = 'Saved copy · updating…'; else markUpdated();
   if (!d.students.length) showMsg(teacher.on ? 'This tank is empty. Click 👥 Students to add your class.' : 'No fish yet. A teacher can add students in Teacher mode.');
   recompute();
   if (teacher.on){
@@ -574,8 +621,10 @@ function recompute(){
   unlocked = new Set(DECOR.filter(function(d){ return classAvg !== null && classAvg >= d.at; }).map(function(d){ return d.key; }));
 
   syncFish();
+  syncQuests();
   renderBoard();
   renderBottom();
+  if (teacher.on) renderAttentionBadge();
   renderExamLabel();
   if (cardKey) renderCard();
 }
@@ -682,8 +731,8 @@ Fish.prototype.update = function(dt){
   this.size += (this.targetLen() - this.size) * Math.min(1, dt*1.4);
   this.chomp = Math.max(0, this.chomp - dt*1.5);
   var max = (34 + 26*this.spd) * SC * [1, .8, .4, .22][m.tier] * (m.stage === 0 ? 1.15 : 1);
-  var hungry = this.food && !this.food.eaten;
-  if (hungry){ this.tx = this.food.x; this.ty = this.food.y; max = Math.max(max*2, 90*SC); }
+  var hungry = this.food && !this.food.eaten && this.food.age > .35;   // a moment to notice the snack
+  if (hungry){ this.tx = this.food.x; this.ty = this.food.y; max = Math.max(max*2.2, 135*SC); }
   var dx = this.tx - this.x, dy = this.ty - this.y, d = Math.hypot(dx,dy) || 1;
   if (hungry){
     if (d < this.size*.45 + 10*SC) eatFood(this.food, this);
@@ -1020,11 +1069,23 @@ function dropFood(name, e, val){
   var f = fishByName(name);
   computeEffMax();
   var mx = effMax[e] || DATA.max[e] || 100;
-  var fd = { name:name, e:e, val:val, kind:foodKind(val/mx*100), x: f ? clamp(f.x + rnd(-80,80)*SC, 30, W-30) : W/2,
-    y:-12, vy:0, age:0, rot:rnd(0,6), eaten:false, section: DATA.section };
+  // the snack appears well above its fish and visibly sinks; the fish notices it, then darts up
+  // to catch it (about 1.5 s in total, even for a fish resting on the sand)
+  var fd = { name:name, e:e, val:val, kind:foodKind(val/mx*100), x: f ? clamp(f.x + rnd(-60,60)*SC, 30, W-30) : W/2,
+    y: f ? Math.max(-12, f.y - 260*SC) : -12, vy:55*SC, age:0, rot:rnd(0,6), eaten:false, section: DATA.section };
   foods.push(fd);
   if (f){ if (f.food && !f.food.eaten) eatFood(f.food, null); f.food = fd; }
   else eatFood(fd, null);
+  return fd;
+}
+/* The sheet said no: take the food back (or undo the score if it was already eaten). */
+function cancelFood(fd, name, e, oldVal){
+  if (fd && !fd.eaten){
+    fd.cancel = true; fd.eaten = true;
+    var i = foods.indexOf(fd); if (i >= 0) foods.splice(i, 1);
+    var f = fishByName(name); if (f && f.food === fd) f.food = null;
+  }
+  if (DATA && fd && fd.section === DATA.section) applyScore(name, e, oldVal);
 }
 function fishByName(name){
   var found = null;
@@ -1032,12 +1093,13 @@ function fishByName(name){
   return found;
 }
 function eatFood(fd, f){
-  if (fd.eaten) return;
+  if (fd.eaten || fd.cancel) return;
   fd.eaten = true;
   var i = foods.indexOf(fd); if (i >= 0) foods.splice(i, 1);
   if (f){
     f.food = null; f.chomp = 1;
     burst(fd.x, fd.y, 'crumb');
+    if (fd.val === 0) sfx('yuck'); else sfx('crunch');
   }
   var h0 = f ? f.m.health : null;
   if (fd.section === DATA.section) applyScore(fd.name, fd.e, fd.val);
@@ -1046,6 +1108,7 @@ function eatFood(fd, f){
     var fp = pctOf(fd.val, fd.e), exl = Number(CFG.excellentPercent) || 90;
     var txt = (fd.val === 0 ? '🤢 0' : (fp >= 100 ? '🌟 ' : fp >= exl ? '🏆 ' : '') + '+' + fmt(fd.val)) + (dh > 0 ? '  ❤️+' + dh + '%' : dh < 0 ? '  💔' + dh + '%' : '');
     if (fp >= 100) burst(nf.x, nf.y, 'boost');
+    if (fp >= 100 || (nf.m.pb && nf.m.pb.e === fd.e)) setTimeout(function(){ sfx('sparkle'); }, 250);
     if (nf.m.pb && nf.m.pb.e === fd.e) popup(nf.x, nf.y - nf.size*.45 - 44*SC, '⭐ Personal best!', '#ffe27a');
     popup(nf.x, nf.y - nf.size*.45 - 14*SC, txt, dh < 0 || fd.val === 0 ? '#c7e88a' : dh > 0 ? '#8dffb0' : '#ffe27a');
   }
@@ -1164,6 +1227,413 @@ function drawSub(c, x, y, s, t){
   c.restore();
 }
 
+/* =====================================================================
+   🐋 CLASS QUESTS — a class goal for one exam; reaching it brings a sea creature to the tank
+   ===================================================================== */
+var CREATURES = {
+  whale:     { icon:'🐋', name:'Whale' },
+  turtle:    { icon:'🐢', name:'Sea turtle' },
+  octopus:   { icon:'🐙', name:'Octopus' },
+  jellyfish: { icon:'🪼', name:'Jellyfish' }
+};
+var questInfo = [], creatures = new Map(), questsReady = false;
+
+function questText(q){
+  return q.goal === 'pass' ? 'At least ' + q.target + ' students score half or more on ' + q.exam
+                           : 'Class average on ' + q.exam + ' reaches ' + q.target + '%';
+}
+/* Progress of a quest using the scores in the sheet (curved exams use the curved %). */
+function evalQuest(q){
+  var e = DATA.exams.indexOf(q.exam), low = clamp(Number(CFG.illPercent) || 50, 1, 99);
+  if (e < 0) return { q:q, e:-1, done:false, frac:0, short:'exam not found' };
+  var taken = DATA.students.map(function(s){ return s.scores[e]; }).filter(function(v){ return v !== null && v !== undefined; });
+  if (q.goal === 'pass'){
+    var n = taken.filter(function(v){ return pctOf(v, e) >= low; }).length;
+    return { q:q, e:e, done:n >= q.target, frac:n/q.target, short:n + '/' + q.target + ' passed' };
+  }
+  var avg = taken.length ? taken.reduce(function(a, v){ return a + pctOf(v, e); }, 0)/taken.length : 0;
+  return { q:q, e:e, done:taken.length > 0 && avg >= q.target, frac:avg/q.target, short:'average ' + Math.round(avg) + '% / ' + q.target + '%' };
+}
+function syncQuests(){
+  computeEffMax();
+  questInfo = (DATA.quests || []).map(evalQuest);
+  var keep = new Set();
+  questInfo.forEach(function(x){
+    if (!x.done || x.e > viewExam) return;          // replay: creature appears from that exam on
+    keep.add(x.q.id);
+    if (!creatures.has(x.q.id)) creatures.set(x.q.id, newCreature(x.q, questsReady && followLatest && !playTimer));
+  });
+  Array.from(creatures.keys()).forEach(function(k){ if (!keep.has(k)) creatures.delete(k); });
+  questsReady = true;
+}
+function newCreature(q, celebrate){
+  var kind = q.creature, dir = Math.random() < .5 ? 1 : -1;
+  var cr = { q:q, kind:kind, dir:dir, ph:rnd(0, 6.28), x:rnd(.1, .9)*W, y:0, enter:0 };
+  cr.L = { whale:230, turtle:90, octopus:80, jellyfish:60 }[kind] * SC;
+  cr.y = kind === 'whale' ? H*rnd(.18, .3) : kind === 'turtle' ? H*rnd(.35, .55) : kind === 'jellyfish' ? H*rnd(.25, .5) : H*.7;
+  if (celebrate){
+    cr.enter = 1; cr.dir = 1; cr.x = -cr.L;
+    toast(CREATURES[kind].icon + ' Quest complete! ' + questText(q) + '. A ' + CREATURES[kind].name.toLowerCase() + ' joins the tank!');
+    sfx('fanfare');
+    for (var i = 0; i < 3; i++) setTimeout(function(){ burst(W*rnd(.3, .7), H*rnd(.25, .5), 'boost'); }, i*350);
+  }
+  return cr;
+}
+function drawCreatures(c, t, dt){
+  creatures.forEach(function(cr){
+    var sp = { whale:16, turtle:24, octopus:12, jellyfish:8 }[cr.kind] * SC * (cr.enter ? 4 : 1);
+    if (cr.enter){ cr.enter = Math.max(0, cr.enter - dt/4); if (cr.x > W*.35) cr.enter = 0; }
+    cr.x += cr.dir*sp*dt;
+    if (cr.x > W + cr.L) cr.x = -cr.L; else if (cr.x < -cr.L) cr.x = W + cr.L;
+    var y = cr.y + Math.sin(t*.6 + cr.ph)*(cr.kind === 'jellyfish' ? 40 : 10)*SC;
+    if (cr.kind === 'octopus') y = sandY(cr.x) - cr.L*.55 + Math.sin(t*1.3 + cr.ph)*6*SC;
+    c.save(); c.translate(cr.x, y); c.scale(cr.dir, 1);
+    if (cr.kind === 'whale') drawWhale(c, cr.L, t + cr.ph);
+    else if (cr.kind === 'turtle') drawTurtle(c, cr.L, t + cr.ph);
+    else if (cr.kind === 'octopus') drawOctopus(c, cr.L, t + cr.ph);
+    else drawJelly(c, cr.L, t + cr.ph);
+    c.restore();
+    if (cr.kind === 'whale' && Math.random() < dt*.25) for (var i = 0; i < 4; i++) bubble(cr.x + cr.dir*cr.L*.3 + rnd(-4, 4), y - cr.L*.16, 'vent');
+  });
+}
+function drawWhale(c, L, t){
+  var tail = Math.sin(t*1.6)*.25;
+  c.save(); c.translate(-L*.42, -L*.02); c.rotate(tail);
+  c.fillStyle = '#4a6f96';
+  c.beginPath(); c.moveTo(0, 0); c.quadraticCurveTo(-L*.12, -L*.02, -L*.2, -L*.12); c.quadraticCurveTo(-L*.12, 0, -L*.2, L*.1); c.quadraticCurveTo(-L*.1, L*.02, 0, 0); c.fill();
+  c.restore();
+  var g = c.createLinearGradient(0, -L*.18, 0, L*.18); g.addColorStop(0, '#6b93bd'); g.addColorStop(1, '#3d5f84');
+  c.fillStyle = g; c.beginPath();
+  c.moveTo(L*.45, -L*.02); c.quadraticCurveTo(L*.42, -L*.2, L*.05, -L*.17); c.quadraticCurveTo(-L*.3, -L*.14, -L*.44, -L*.02);
+  c.quadraticCurveTo(-L*.2, L*.13, L*.1, L*.15); c.quadraticCurveTo(L*.42, L*.14, L*.45, -L*.02); c.fill();
+  c.fillStyle = '#d6e4f0'; c.beginPath(); c.moveTo(L*.42, L*.04); c.quadraticCurveTo(L*.1, L*.17, -L*.2, L*.07); c.quadraticCurveTo(L*.1, L*.1, L*.42, L*.04); c.fill();
+  c.strokeStyle = 'rgba(70,100,140,.35)'; c.lineWidth = Math.max(1, L*.006);
+  for (var i = 0; i < 4; i++){ c.beginPath(); c.moveTo(L*(.35 - i*.1), L*(.07 + i*.012)); c.lineTo(L*(.25 - i*.1), L*(.1 + i*.008)); c.stroke(); }
+  c.fillStyle = '#365677'; c.save(); c.translate(L*.05, L*.08); c.rotate(.5 + Math.sin(t*1.2)*.15);
+  c.beginPath(); c.ellipse(0, L*.05, L*.03, L*.08, 0, 0, 7); c.fill(); c.restore();
+  c.fillStyle = '#10202e'; c.beginPath(); c.arc(L*.3, -L*.01, Math.max(2, L*.016), 0, 7); c.fill();
+  c.strokeStyle = 'rgba(20,40,60,.5)'; c.lineWidth = Math.max(1, L*.008);
+  c.beginPath(); c.moveTo(L*.44, L*.02); c.quadraticCurveTo(L*.38, L*.05, L*.3, L*.04); c.stroke();
+}
+function drawTurtle(c, L, t){
+  var f = Math.sin(t*2.2)*.5;
+  c.fillStyle = '#7fb069';
+  [[L*.18, -L*.18, -.6 + f], [L*.18, L*.18, .6 - f], [-L*.22, -L*.16, -2.4 - f*.5], [-L*.22, L*.16, 2.4 + f*.5]].forEach(function(p, i){
+    c.save(); c.translate(p[0], p[1]*.6); c.rotate(p[2]); c.beginPath(); c.ellipse(L*(i < 2 ? .14 : .08), 0, L*(i < 2 ? .16 : .09), L*.05, 0, 0, 7); c.fill(); c.restore();
+  });
+  c.beginPath(); c.ellipse(L*.38, 0, L*.12, L*.09, 0, 0, 7); c.fill();
+  c.fillStyle = '#10202e'; c.beginPath(); c.arc(L*.43, -L*.03, Math.max(1.5, L*.018), 0, 7); c.fill();
+  var g = c.createRadialGradient(-L*.05, -L*.08, L*.05, 0, 0, L*.32); g.addColorStop(0, '#5aa86f'); g.addColorStop(1, '#2e6b45');
+  c.fillStyle = g; c.beginPath(); c.ellipse(0, 0, L*.32, L*.22, 0, 0, 7); c.fill();
+  c.strokeStyle = 'rgba(200,240,190,.45)'; c.lineWidth = Math.max(1, L*.012);
+  [[0, 0], [-L*.15, -L*.08], [L*.15, -L*.08], [-L*.15, L*.08], [L*.15, L*.08]].forEach(function(p){
+    c.beginPath(); for (var k = 0; k < 6; k++){ var a = k*Math.PI/3; c.lineTo(p[0] + Math.cos(a)*L*.07, p[1] + Math.sin(a)*L*.06); } c.closePath(); c.stroke();
+  });
+}
+function drawOctopus(c, L, t){
+  c.lineCap = 'round';
+  for (var i = 0; i < 6; i++){
+    var bx = (-.25 + i*.1)*L; c.strokeStyle = '#c4508f'; c.lineWidth = Math.max(2, L*.07);
+    c.beginPath(); c.moveTo(bx, L*.1);
+    for (var k = 1; k <= 6; k++) c.lineTo(bx + Math.sin(t*2 + i + k*.6)*L*.06*k/6 + (i - 2.5)*k*L*.012, L*.1 + k*L*.07);
+    c.stroke();
+  }
+  var g = c.createRadialGradient(-L*.06, -L*.14, L*.04, 0, -L*.05, L*.35); g.addColorStop(0, '#ff9bd0'); g.addColorStop(1, '#c4508f');
+  c.fillStyle = g; c.beginPath(); c.ellipse(0, -L*.08, L*.3, L*.27, 0, 0, 7); c.fill();
+  [-1, 1].forEach(function(s){
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(s*L*.1 + L*.04, -L*.04, L*.07, 0, 7); c.fill();
+    c.fillStyle = '#10202e'; c.beginPath(); c.arc(s*L*.1 + L*.06, -L*.03, L*.035, 0, 7); c.fill();
+  });
+  c.strokeStyle = 'rgba(80,20,50,.6)'; c.lineWidth = Math.max(1, L*.015);
+  c.beginPath(); c.arc(L*.05, L*.04, L*.05, .2, Math.PI - .2); c.stroke();
+}
+function drawJelly(c, L, t){
+  var p = 1 + Math.sin(t*2.5)*.12;
+  drawGlow(c, 0, 0, L*.9, '255,160,230', .25);
+  c.strokeStyle = 'rgba(255,190,235,.6)'; c.lineWidth = Math.max(1, L*.02);
+  for (var i = 0; i < 5; i++){
+    var bx = (-.25 + i*.125)*L; c.beginPath(); c.moveTo(bx, 0);
+    for (var k = 1; k <= 8; k++) c.lineTo(bx + Math.sin(t*2 + i + k*.7)*L*.05, k*L*.12);
+    c.stroke();
+  }
+  var g = c.createRadialGradient(0, -L*.15, L*.05, 0, -L*.1, L*.45); g.addColorStop(0, 'rgba(255,220,245,.95)'); g.addColorStop(1, 'rgba(230,120,200,.75)');
+  c.fillStyle = g; c.beginPath(); c.ellipse(0, 0, L*.36*p, L*.3/p, 0, Math.PI, 0); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.ellipse(-L*.1, -L*.15, L*.06, L*.04, -.4, 0, 7); c.fill();
+}
+
+/* =====================================================================
+   🎄 SEASONAL TANKS — chosen by date (preview any of them with ?season=christmas etc.)
+   ===================================================================== */
+var SEASONS = { christmas:'🎄 Christmas', valentine:'💗 Valentine’s week', rainy:'🌧️ Rainy season', wika:'🇵🇭 Buwan ng Wika', halloween:'🎃 Halloween' };
+function currentSeason(){
+  var q = QP.get('season');
+  if (q) return SEASONS[q] ? q : '';
+  if (CFG.seasonal === false) return '';
+  var d = new Date(nowMs()), m = d.getMonth() + 1, day = d.getDate();
+  if ((m === 10 && day >= 25) || (m === 11 && day <= 2)) return 'halloween';
+  if ((m === 11 && day >= 3) || m === 12 || (m === 1 && day <= 6)) return 'christmas';
+  if (m === 2 && day >= 7 && day <= 14) return 'valentine';
+  if ((m === 6 && day >= 15) || m === 7) return 'rainy';
+  if (m === 8) return 'wika';
+  return '';
+}
+var seasonNow = '', seasonChecked = -1e9, ripples = [];
+function drawSeason(c, t, dt){
+  if (t - seasonChecked > 60){ seasonNow = currentSeason(); seasonChecked = t; }
+  var s = seasonNow; if (!s) return;
+  if (s === 'christmas'){ drawLights(c, t); drawParol(c, W*.86, 0, t); }
+  else if (s === 'wika') drawBanderitas(c, t);
+  else if (s === 'halloween'){ [[.3, 1], [.66, .8], [.95, .7]].forEach(function(p){ drawPumpkin(c, W*p[0], sandY(W*p[0]) + 4*SC, 26*SC*p[1], t); }); }
+  else if (s === 'valentine'){ if (Math.random() < dt*1.5) bubble(rnd(0, W), H*.85, 'heart', rnd(4, 7)*SC); }
+  else if (s === 'rainy'){
+    c.fillStyle = 'rgba(15,30,50,.12)'; c.fillRect(0, 0, W, H);
+    if (Math.random() < dt*(Q ? 14 : 5)) ripples.push({ x:rnd(0, W), life:0 });
+    c.lineWidth = 1.2;
+    for (var i = ripples.length - 1; i >= 0; i--){
+      var r = ripples[i]; r.life += dt;
+      if (r.life > 1.2){ ripples.splice(i, 1); continue; }
+      c.strokeStyle = 'rgba(230,245,255,' + (.85*(1 - r.life/1.2)) + ')';
+      c.beginPath(); c.ellipse(r.x, 14, 5 + r.life*34*SC, 2 + r.life*7*SC, 0, 0, 7); c.stroke();
+      if (r.life < .25){ c.beginPath(); c.moveTo(r.x, 14 - 26*SC*(1 - r.life*4)); c.lineTo(r.x, 14 - 12*SC*(1 - r.life*4)); c.stroke(); }
+    }
+  }
+}
+function sagY(x, y0, span, sag){ var u = (x % span)/span; return y0 + Math.sin(u*Math.PI)*sag; }
+function drawLights(c, t){
+  var span = 220*SC, y0 = 6, sag = 26*SC, cols = ['255,80,80', '80,220,120', '255,210,80', '90,170,255'];
+  c.strokeStyle = 'rgba(30,50,40,.8)'; c.lineWidth = 1.5; c.beginPath();
+  for (var x = 0; x <= W; x += 10) c.lineTo(x, sagY(x, y0, span, sag)); c.stroke();
+  var n = 0;
+  for (x = 14*SC; x < W; x += 34*SC, n++){
+    var y = sagY(x, y0, span, sag) + 6*SC, col = cols[n % 4], on = .55 + .45*Math.sin(t*3 + n*1.7);
+    drawGlow(c, x, y, 16*SC, col, .5*on);
+    c.fillStyle = 'rgba(' + col + ',' + (.6 + .4*on) + ')'; c.beginPath(); c.ellipse(x, y, 4*SC, 6*SC, 0, 0, 7); c.fill();
+  }
+}
+function drawParol(c, x, top, t){
+  var r = 38*SC, y = 70*SC + Math.sin(t*.8)*3*SC;
+  c.strokeStyle = 'rgba(30,50,40,.8)'; c.lineWidth = 1.5; c.beginPath(); c.moveTo(x, top); c.lineTo(x, y - r); c.stroke();
+  drawGlow(c, x, y, r*2.4, '255,200,90', .35 + .1*Math.sin(t*2));
+  c.save(); c.translate(x, y);
+  c.strokeStyle = '#ffd34d'; c.lineWidth = 3*SC; c.beginPath(); c.arc(0, 0, r*1.05, 0, 7); c.stroke();
+  c.beginPath();
+  for (var i = 0; i < 10; i++){ var a = -Math.PI/2 + i*Math.PI/5, rr2 = i % 2 ? r*.42 : r; c.lineTo(Math.cos(a)*rr2, Math.sin(a)*rr2); }
+  c.closePath(); var g = c.createRadialGradient(0, 0, 2, 0, 0, r); g.addColorStop(0, '#fff6c0'); g.addColorStop(1, '#ff5d5d');
+  c.fillStyle = g; c.fill(); c.strokeStyle = '#c0392b'; c.lineWidth = 1.5; c.stroke();
+  ['#ff5d5d', '#ffd34d', '#4cc9f0'].forEach(function(col, i){
+    c.strokeStyle = col; c.lineWidth = 3*SC; c.beginPath(); c.moveTo((-8 + i*8)*SC, r*.95);
+    for (var k = 1; k <= 6; k++) c.lineTo((-8 + i*8)*SC + Math.sin(t*2 + k + i)*5*SC, r*.95 + k*9*SC);
+    c.stroke();
+  });
+  c.restore();
+}
+function drawBanderitas(c, t){
+  var span = 260*SC, y0 = 4, sag = 30*SC, cols = ['#0038a8', '#ce1126', '#fcd116', '#ffffff'];
+  c.strokeStyle = 'rgba(255,255,255,.7)'; c.lineWidth = 1.2; c.beginPath();
+  for (var x = 0; x <= W; x += 10) c.lineTo(x, sagY(x, y0, span, sag)); c.stroke();
+  var n = 0;
+  for (x = 10*SC; x < W; x += 26*SC, n++){
+    var y = sagY(x, y0, span, sag), sw = Math.sin(t*2.5 + n)*.12;
+    c.save(); c.translate(x, y); c.rotate(sw);
+    c.fillStyle = cols[n % 4]; c.beginPath(); c.moveTo(-10*SC, 0); c.lineTo(10*SC, 0); c.lineTo(0, 22*SC); c.closePath(); c.fill();
+    c.restore();
+  }
+}
+function drawPumpkin(c, x, y, r, t){
+  drawGlow(c, x, y - r*.6, r*2.2, '255,150,40', .3 + .1*Math.sin(t*4 + x));
+  c.save(); c.translate(x, y - r*.75);
+  c.fillStyle = '#e8762b';
+  [-.45, 0, .45].forEach(function(o){ c.beginPath(); c.ellipse(o*r, 0, r*.55, r*.75, 0, 0, 7); c.fill(); });
+  c.fillStyle = '#4a7a2c'; c.fillRect(-r*.08, -r*.95, r*.16, r*.3);
+  c.fillStyle = 'rgba(255,220,90,' + (.75 + .25*Math.sin(t*5 + x)) + ')';
+  c.beginPath(); c.moveTo(-r*.4, -r*.15); c.lineTo(-r*.2, -r*.35); c.lineTo(-r*.05, -r*.15); c.fill();
+  c.beginPath(); c.moveTo(r*.05, -r*.15); c.lineTo(r*.2, -r*.35); c.lineTo(r*.4, -r*.15); c.fill();
+  c.beginPath(); c.moveTo(-r*.4, r*.15); c.lineTo(-r*.25, r*.3); c.lineTo(-r*.1, r*.18); c.lineTo(0, r*.32); c.lineTo(r*.1, r*.18); c.lineTo(r*.25, r*.3); c.lineTo(r*.4, r*.15); c.closePath(); c.fill();
+  c.restore();
+}
+function drawHeart(c, x, y, r, col){
+  c.fillStyle = col; c.beginPath(); c.moveTo(x, y + r*.35);
+  c.bezierCurveTo(x - r*1.1, y - r*.3, x - r*.45, y - r, x, y - r*.45);
+  c.bezierCurveTo(x + r*.45, y - r, x + r*1.1, y - r*.3, x, y + r*.35); c.fill();
+}
+
+/* =====================================================================
+   🔊 SOUND — made by the browser (no files to download). Muted until you turn it on.
+   ===================================================================== */
+var snd = { on:false, ctx:null, master:null, amb:null, noise:null, blipT:0 };
+function sndPref(){ try { return localStorage.getItem('aquarium|sound') === 'on'; } catch (e){ return false; } }
+function sndInit(){
+  if (snd.ctx) return true;
+  var AC = window.AudioContext || window.webkitAudioContext; if (!AC) return false;
+  var ctx = snd.ctx = new AC();
+  snd.master = ctx.createGain(); snd.master.gain.value = .6; snd.master.connect(ctx.destination);
+  var len = ctx.sampleRate*4, buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0), last = 0;
+  for (var i = 0; i < len; i++){ var w = Math.random()*2 - 1; last = (last + .02*w)/1.02; d[i] = last*3.2; }   // soft "brown" noise = waves
+  snd.noise = buf;
+  var src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+  var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 420;
+  snd.amb = ctx.createGain(); snd.amb.gain.value = 0;
+  var lfo = ctx.createOscillator(), lfoG = ctx.createGain(); lfo.frequency.value = .09; lfoG.gain.value = .05;
+  lfo.connect(lfoG); lfoG.connect(snd.amb.gain); lfo.start();
+  src.connect(lp); lp.connect(snd.amb); snd.amb.connect(snd.master); src.start();
+  return true;
+}
+function setSound(on){
+  snd.on = on;
+  try { localStorage.setItem('aquarium|sound', on ? 'on' : 'off'); } catch (e){}
+  $('sndBtn').textContent = on ? '🔊' : '🔇'; $('sndBtn').classList.toggle('on', on);
+  if (on){
+    if (!sndInit()){ toast('Sound is not supported on this browser.'); return; }
+    if (snd.ctx.state === 'suspended') snd.ctx.resume();
+    snd.amb.gain.setTargetAtTime(.1, snd.ctx.currentTime, .8);
+  } else if (snd.ctx){
+    snd.amb.gain.setTargetAtTime(0, snd.ctx.currentTime, .2);
+    setTimeout(function(){ if (!snd.on && snd.ctx) snd.ctx.suspend(); }, 800);
+  }
+}
+$('sndBtn').addEventListener('click', function(){ setSound(!snd.on); });
+if (sndPref()){   // browsers only allow sound after a tap/click, so wait for the first one
+  $('sndBtn').textContent = '🔊'; $('sndBtn').classList.add('on');
+  var startSnd = function(){ document.removeEventListener('pointerdown', startSnd, true); if (sndPref()) setSound(true); };
+  document.addEventListener('pointerdown', startSnd, true);
+}
+function tone(type, f0, f1, dur, vol, delay){
+  var ctx = snd.ctx, t0 = ctx.currentTime + (delay || 0), o = ctx.createOscillator(), g = ctx.createGain();
+  o.type = type; o.frequency.setValueAtTime(f0, t0); if (f1) o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+  g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(vol, t0 + .01); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+  o.connect(g); g.connect(snd.master); o.start(t0); o.stop(t0 + dur + .02);
+}
+function noiseHit(freq, dur, vol, delay){
+  var ctx = snd.ctx, t0 = ctx.currentTime + (delay || 0), src = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain();
+  src.buffer = snd.noise; bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = 1.2;
+  g.gain.setValueAtTime(vol, t0); g.gain.exponentialRampToValueAtTime(.0001, t0 + dur);
+  src.connect(bp); bp.connect(g); g.connect(snd.master); src.start(t0, Math.random()*3, dur + .02);
+}
+function sfx(kind){
+  if (!snd.on || !snd.ctx || snd.ctx.state !== 'running') return;
+  try {
+    if (kind === 'crunch'){ for (var i = 0; i < 3; i++) noiseHit(1600 + Math.random()*900, .05, 2.2, i*.055 + Math.random()*.01); }
+    else if (kind === 'yuck'){ tone('sawtooth', 160, 85, .35, .06); tone('sine', 120, 70, .4, .1, .05); }
+    else if (kind === 'sparkle'){ [1319, 1568, 2093, 2637].forEach(function(f, i){ tone('sine', f, 0, .25, .07, i*.07); }); }
+    else if (kind === 'boost'){ tone('triangle', 400, 1300, .25, .09); tone('sine', 900, 1800, .2, .05, .08); }
+    else if (kind === 'fanfare'){ tone('sine', 180, 340, .9, .12); tone('sine', 340, 220, .9, .1, .9); [523, 659, 784, 1047].forEach(function(f, i){ tone('triangle', f, 0, .35, .08, 1.7 + i*.12); }); }
+    else if (kind === 'blip'){ tone('sine', 320 + Math.random()*200, 900 + Math.random()*400, .09, .035); }
+  } catch (e){}
+}
+setInterval(function(){ if (snd.on && document.visibilityState === 'visible' && Math.random() < .5) sfx('blip'); }, 2500);   // gentle bubbles
+
+/* =====================================================================
+   🚩 NEEDS ATTENTION — teacher-only list of students who may need help (uses all exams so far)
+   ===================================================================== */
+function attentionList(){
+  computeEffMax();
+  var low = clamp(Number(CFG.illPercent) || 50, 1, 99), ex = clamp(Number(CFG.excellentPercent) || 90, low + 1, 100), L = DATA.lastExam;
+  var given = DATA.exams.map(function(_, e){ return DATA.students.some(function(s){ return s.scores[e] !== null && s.scores[e] !== undefined; }); });
+  var out = [];
+  DATA.students.forEach(function(s, i){
+    var taken = [];
+    for (var e = 0; e <= L; e++){ var v = s.scores[e]; if (v !== null && v !== undefined) taken.push({ e:e, sc:v, pct:pctOf(v, e) }); }
+    var hl = runHealth(taken, low, ex), why = [], sev = 0;
+    if (hl.tier === 3){ why.push('🤢 Very ill: 3 or more low scores in a row'); sev = Math.max(sev, 3); }
+    else if (hl.lowRun === 2){ why.push('⚠️ 2 low scores in a row — one more makes the fish very ill'); sev = Math.max(sev, 2); }
+    else if (hl.tier === 2){ why.push('🤒 Ill after a low score'); sev = Math.max(sev, 1); }
+    var lastT = taken[taken.length - 1];
+    if (lastT && lastT.e === L && lastT.sc === 0){ why.push('0️⃣ Scored 0 on ' + DATA.exams[L]); sev = Math.max(sev, 2); }
+    if (lastT && lastT.e === L && taken.length >= 3){
+      var prev = taken.slice(0, -1), avg = prev.reduce(function(a, x){ return a + x.pct; }, 0)/prev.length;
+      if (avg - lastT.pct >= 20){ why.push('📉 Dropped to ' + Math.round(lastT.pct) + '% on ' + DATA.exams[L] + ' (usually about ' + Math.round(avg) + '%)'); sev = Math.max(sev, 2); }
+    }
+    var miss = 0;
+    for (e = L; e >= 0; e--){ if (!given[e]) continue; if (s.scores[e] === null || s.scores[e] === undefined) miss++; else break; }
+    if (miss >= 2){ why.push('🚪 Absent for the last ' + miss + ' exams'); sev = Math.max(sev, 2); }
+    if (why.length) out.push({ i:i, name:s.name, why:why, sev:sev, health:hl.health });
+  });
+  return out.sort(function(a, b){ return b.sev - a.sev || a.health - b.health || a.name.localeCompare(b.name); });
+}
+function renderAttentionBadge(){
+  var n = attentionList().length, b = $('attBadge');
+  b.hidden = !n; b.textContent = n;
+}
+$('attBtn').addEventListener('click', function(){
+  var list = attentionList();
+  openModal('<h3>🚩 Needs attention · ' + esc(DATA.section) + '</h3>' +
+    '<p>Students who may need a check-in, based on every exam so far. Only you can see this.</p>' +
+    (list.length ? '<div class="att">' + list.map(function(x){
+      return '<button class="attRow sev' + x.sev + '" data-att="' + x.i + '"><b>' + esc(x.name) + '</b> <span class="muted">· health ' + x.health + '%</span>' +
+        x.why.map(function(w){ return '<div>' + esc(w) + '</div>'; }).join('') + '</button>';
+    }).join('') + '</div>' : '<p>🎉 Nobody needs attention right now.</p>') +
+    '<div class="actions"><button class="primary" id="attOk">Close</button></div>', function(b){
+      b.querySelector('#attOk').onclick = closeModal;
+      Array.prototype.forEach.call(b.querySelectorAll('[data-att]'), function(btn){
+        btn.onclick = function(){
+          var m = models[+btn.getAttribute('data-att')];
+          closeModal(); if (m) openCard(m.key);
+        };
+      });
+    });
+});
+
+/* ---------- 🐋 quests window (teacher) ---------- */
+$('questBtn').addEventListener('click', openQuests);
+function openQuests(){
+  if (!DATA.exams.length){ toast('Create an exam first, then set a quest for it.'); return; }
+  var picked = 'whale', ex = DATA.exams[feedExam >= 0 ? feedExam : DATA.exams.length - 1];
+  var list = questInfo.map(function(x){
+    return '<div class="qrow">' + CREATURES[x.q.creature].icon + '<span>' + esc(questText(x.q)) + ' <span class="muted">· ' +
+      (x.done ? '✅ done' : esc(x.short)) + '</span></span><button data-rmq="' + esc(x.q.id) + '">Remove</button></div>';
+  }).join('');
+  openModal('<h3>🐋 Class quests</h3><p>Give the class a shared goal for an exam. When they reach it, the creature swims into the tank and stays as a class trophy.</p>' +
+    '<label>Creature</label><div class="creatures">' + Object.keys(CREATURES).map(function(k){
+      return '<button class="perk' + (k === picked ? ' sel' : '') + '" data-cr="' + k + '"><b>' + CREATURES[k].icon + '</b>' + CREATURES[k].name + '</button>';
+    }).join('') + '</div>' +
+    '<div class="grid2"><div><label>Exam</label><select id="qExam" style="width:100%">' + DATA.exams.map(function(x){ return '<option' + (x === ex ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join('') + '</select></div>' +
+    '<div><label>Goal</label><select id="qGoal" style="width:100%"><option value="pass">Number of students who score half or more</option><option value="average">Class average (%)</option></select></div></div>' +
+    '<label id="qLbl">How many students?</label><input type="number" id="qTarget" min="1" value="' + Math.max(1, Math.ceil(DATA.students.length*.8)) + '">' +
+    '<div class="err" id="qErr"></div><div class="actions"><button id="qCancel">Cancel</button><button class="primary" id="qGo">🐋 Start quest</button></div>' +
+    (list ? '<label>Quests</label><div class="slist">' + list + '</div>' : ''), function(b){
+      b.querySelector('#qCancel').onclick = closeModal;
+      Array.prototype.forEach.call(b.querySelectorAll('[data-cr]'), function(btn){
+        btn.onclick = function(){ picked = btn.getAttribute('data-cr'); Array.prototype.forEach.call(b.querySelectorAll('[data-cr]'), function(x){ x.classList.toggle('sel', x === btn); }); };
+      });
+      var goal = b.querySelector('#qGoal'), tgt = b.querySelector('#qTarget');
+      goal.onchange = function(){
+        var avg = goal.value === 'average';
+        b.querySelector('#qLbl').textContent = avg ? 'Class average to reach (%)' : 'How many students?';
+        tgt.value = avg ? 75 : Math.max(1, Math.ceil(DATA.students.length*.8));
+      };
+      b.querySelector('#qGo').onclick = function(){
+        var t = Number(tgt.value), g = goal.value, exam = b.querySelector('#qExam').value, section = DATA.section;
+        if (!(t >= 1) || (g === 'average' ? t > 100 : t > DATA.students.length)){
+          b.querySelector('#qErr').textContent = g === 'average' ? 'Choose a class average from 1 to 100%.' : 'Choose from 1 to ' + DATA.students.length + ' students.'; return;
+        }
+        var tmp = { id:'tmp' + Date.now(), creature:picked, goal:g, exam:exam, target:t, at:nowMs(), pending:true };
+        DATA.quests.push(tmp); closeModal(); recompute();
+        toast(CREATURES[picked].icon + ' Quest started: ' + questText(tmp));
+        api('addQuest', teacher.pin, section, picked, g, exam, t).then(function(r){
+          if (r && r.quest){ var old = tmp.id; tmp.id = r.quest.id; var cr = creatures.get(old); if (cr){ creatures.delete(old); creatures.set(tmp.id, cr); } }
+          tmp.pending = false;
+        }).catch(function(e){
+          var i = DATA.quests.indexOf(tmp); if (i >= 0) DATA.quests.splice(i, 1);
+          if (DATA.section === section) recompute();
+          if (isAuthErr(e)) handleTeacherError(e); else toast('⚠ The quest was not saved: ' + errText(e));
+        });
+      };
+      Array.prototype.forEach.call(b.querySelectorAll('[data-rmq]'), function(btn){
+        btn.onclick = function(){
+          if (!btn.classList.contains('danger')){ btn.classList.add('danger'); btn.textContent = 'Sure?'; return; }
+          var id = btn.getAttribute('data-rmq'), section = DATA.section, q = DATA.quests.filter(function(x){ return x.id === id; })[0];
+          if (!q) return;
+          if (q.pending){ toast('Still saving that quest, try again in a moment.'); return; }
+          DATA.quests.splice(DATA.quests.indexOf(q), 1); recompute(); openQuests();
+          api('removeQuest', teacher.pin, section, id).catch(function(e){
+            if (DATA.section === section){ DATA.quests.push(q); recompute(); }
+            if (isAuthErr(e)) handleTeacherError(e); else toast('⚠ The quest was not removed: ' + errText(e));
+          });
+        };
+      });
+    });
+}
+
 /* ---------- main render ---------- */
 function renderScene(t, dt){
   var c = ctx;
@@ -1199,6 +1669,7 @@ function renderScene(t, dt){
     if (Math.random() < dt*1.2) bubble(W*.58 + rnd(-20,20)*s, sandY(W*.58) - 40*s, 'gold');
   }
   if (unlocked.has('sub')) drawSub(c, W*.84, sandY(W*.84) - 60*s, s, t);
+  drawSeason(c, t, dt);
   scene.vents.forEach(function(v){
     v.t -= dt;
     if (v.t <= 0){ bubble(v.x + rnd(-4,4), sandY(v.x), 'vent'); v.t = Math.random() < .3 ? rnd(1.5,4) : rnd(.15,.35); }
@@ -1223,6 +1694,7 @@ function renderFX(c, t, dt){
     var b = bubbles[i];
     b.life += dt; b.y -= b.vy*dt; b.x += Math.sin(b.life*3 + b.ph)*.35;
     if (b.y < -10 || (b.kind === 'sick' && b.life > 3.5)){ bubbles.splice(i,1); continue; }
+    if (b.kind === 'heart'){ drawHeart(c, b.x, b.y, b.r*1.6, 'rgba(255,110,160,.75)'); continue; }
     c.beginPath(); c.arc(b.x, b.y, b.r, 0, 7);
     if (b.kind === 'sick'){ c.fillStyle = 'rgba(175,220,110,.3)'; c.strokeStyle = 'rgba(205,240,150,.75)'; }
     else if (b.kind === 'gold'){ c.fillStyle = 'rgba(255,220,120,.2)'; c.strokeStyle = 'rgba(255,230,150,.7)'; }
@@ -1296,8 +1768,9 @@ function drawFrame(now){
   ctx.setTransform(DPR,0,0,DPR,0,0); ctx.globalAlpha = 1;
   if (W && H){
     renderScene(t, dt);
+    drawCreatures(ctx, t, dt);
     foods.slice().forEach(function(fd){
-      fd.age += dt; fd.vy = Math.min(fd.vy + 70*SC*dt, 75*SC); fd.y += fd.vy*dt; fd.x += Math.sin(fd.age*2 + fd.rot)*.4;
+      fd.age += dt; fd.vy = Math.min(fd.vy + 70*SC*dt, 90*SC); fd.y += fd.vy*dt; fd.x += Math.sin(fd.age*2 + fd.rot)*.4;
       var gy = sandY(fd.x) - 8*SC; if (fd.y > gy) fd.y = gy;
       if (fd.age > 9) eatFood(fd, fishByName(fd.name));
       else drawFood(ctx, fd, t);
@@ -1374,6 +1847,7 @@ document.addEventListener('keydown', function(e){
   if (k === 'l') toggleLabels();
   else if (k === 'b') toggleBoard();
   else if (k === 'f') toggleFS();
+  else if (k === 'm') setSound(!snd.on);
   else if ((k === 'arrowleft' || k === 'arrowright') && DATA){
     viewExam = clamp(viewExam + (k === 'arrowright' ? 1 : -1), -1, DATA.lastExam);
     followLatest = viewExam === DATA.lastExam; $('exam').value = viewExam; recompute();
@@ -1456,6 +1930,11 @@ function renderBottom(){
   var next = DECOR.filter(function(d){ return !unlocked.has(d.key); })[0];
   $('unlockPill').innerHTML = (have ? have + ' &nbsp;·&nbsp; ' : '') +
     (next ? 'Next for the class: ' + next.icon + ' ' + next.name + ' at ' + next.at + '% average' : 'Every decoration unlocked! 🎉');
+  // open class quests
+  $('questPills').innerHTML = questInfo.filter(function(x){ return !x.done && x.e >= 0; }).slice(0, 3).map(function(x){
+    return '<div class="pill qpill" title="' + esc(questText(x.q)) + '">' + CREATURES[x.q.creature].icon +
+      '<span class="t">' + esc(x.q.exam) + ': ' + esc(x.short) + '</span><span class="bar"><i style="width:' + Math.round(clamp(x.frac, 0, 1)*100) + '%"></i></span></div>';
+  }).join('');
 }
 function renderExamLabel(){ $('examLabel').textContent = viewExam >= 0 ? DATA.exams[viewExam] : 'Start of term'; }
 
@@ -1581,6 +2060,7 @@ function onEnter(el, fn){ el.addEventListener('keydown', function(e){ if (e.key 
 var NO_PIN_HELP = 'No teacher PIN has been set yet. Open the Google Sheet and choose 🐠 Aquarium → Set teacher PIN (only people who can edit the sheet can do this), then try again.';
 function openLogin(){
   if (!DATA){ toast('Please wait for the tank to load.'); return; }
+  if (live) load();          // wakes Apps Script up while the teacher types the PIN, so unlocking is quick
   openModal('<h3>🔒 Teacher mode</h3><p>Enter your teacher PIN to feed the fish and manage the class.</p>' +
     (DATA.hasPin === false ? '<p style="color:var(--warn)">' + esc(NO_PIN_HELP) + '</p>' : '') +
     '<input type="password" id="pinIn" autocomplete="current-password" placeholder="PIN">' +
@@ -1720,18 +2200,35 @@ function openBoost(name){
       go.onclick = function(){
         var pts = b.querySelector('#bPts').value.trim();
         if (pts !== '' && !(Number(pts) >= 0 && Number(pts) <= 1000)){ b.querySelector('#bErr').textContent = 'Bonus points must be a number from 0 to 1000.'; return; }
-        busy(go, true, 'Giving…');
-        api('addBoost', teacher.pin, DATA.section, name, picked, pts === '' ? 0 : Number(pts), b.querySelector('#bWhy').value, exam).then(function(d){
-          closeModal(); onData(d);
-          toast('⚡ ' + name + ' got a ' + PERKS[picked].name + (Number(pts) ? ' and +' + fmt(Number(pts)) + ' bonus points' : '') + '!');
-        }).catch(function(e){ if (isAuthErr(e)) return handleTeacherError(e); b.querySelector('#bErr').textContent = errText(e); busy(go, false, '⚡ Give boost'); });
+        // Instant: the fish gets its outfit now; the sheet is updated in the background.
+        var why = b.querySelector('#bWhy').value.trim().slice(0, 120), perk = picked, section = DATA.section;
+        var tmp = { id:'tmp' + Date.now() + Math.random(), student:name, perk:perk, points:pts === '' ? 0 : Number(pts),
+          reason:why, exam:exam || '', at:nowMs(), date:'just now', pending:true };
+        DATA.boosts.push(tmp);
+        closeModal(); recompute(); renderFeed(); sfx('boost');
+        toast('⚡ ' + name + ' got a ' + PERKS[perk].name + (tmp.points ? ' and +' + fmt(tmp.points) + ' bonus points' : '') + '!');
+        api('addBoost', teacher.pin, section, name, perk, tmp.points, why, exam).then(function(r){
+          if (r && r.boost){ tmp.id = r.boost.id; tmp.at = r.boost.at || tmp.at; tmp.date = r.boost.date || tmp.date; }
+          tmp.pending = false;
+        }).catch(function(e){
+          if (DATA && DATA.boosts){ var i = DATA.boosts.indexOf(tmp); if (i >= 0) DATA.boosts.splice(i, 1); }
+          if (DATA && DATA.section === section){ recompute(); if (teacher.on) renderFeed(); }
+          if (isAuthErr(e)) handleTeacherError(e); else toast('⚠ The boost for ' + name + ' was not saved: ' + errText(e));
+        });
       };
       Array.prototype.forEach.call(b.querySelectorAll('[data-rmb]'), function(btn){
         btn.onclick = function(){
           if (!btn.classList.contains('danger')){ btn.classList.add('danger'); btn.textContent = 'Sure?'; return; }
-          busy(btn, true, 'Removing…');
-          api('removeBoost', teacher.pin, DATA.section, btn.getAttribute('data-rmb')).then(function(d){ onData(d); openBoost(name); })
-            .catch(function(e){ handleTeacherError(e); busy(btn, false, 'Remove'); });
+          var id = btn.getAttribute('data-rmb'), section = DATA.section;
+          var gone = DATA.boosts.filter(function(x){ return x.id === id; })[0];
+          if (!gone) return;
+          if (gone.pending){ toast('Still saving that boost, try again in a moment.'); return; }
+          DATA.boosts.splice(DATA.boosts.indexOf(gone), 1);        // instant
+          recompute(); renderFeed(); openBoost(name);
+          api('removeBoost', teacher.pin, section, id).catch(function(e){
+            if (DATA && DATA.section === section){ DATA.boosts.push(gone); recompute(); if (teacher.on) renderFeed(); }
+            if (isAuthErr(e)) handleTeacherError(e); else toast('⚠ The boost was not removed: ' + errText(e));
+          });
         };
       });
     });
@@ -1753,6 +2250,7 @@ $('rulesLink').addEventListener('click', function(){
     '<li>🩹 <b>Scar:</b> a 0 leaves a scar that fades once the fish is back to full health.</li>' +
     '<li>⭐ <b>Personal best:</b> beat your own best score and your fish shines with a star.</li>' +
     '<li>🎚️ <b>Curved exams:</b> on hard exams your teacher can make the top score in class count as 100%.</li>' +
+    '<li>🐋 <b>Class quests:</b> reach a class goal together and a sea creature joins your tank for good.</li>' +
     '<li>⚡ <b>Boosts:</b> your teacher can reward extra effort with an outfit (lasts 6 hours) and bonus points (kept for good).</li>' +
     '</ul><p>Health shows how you are doing lately. Your fish\'s <b>size</b> comes from your total score, so it never shrinks.</p>' +
     '<div class="actions"><button class="primary" id="rOk">Got it</button></div>', function(b){ b.querySelector('#rOk').onclick = closeModal; });
@@ -1796,21 +2294,25 @@ function submitFeed(inp){
   if (playTimer) stopPlay();
   followLatest = true;
   var section = DATA.section, exam = DATA.exams[e], name = s.name;
+  // Instant: the fish eats right away. The sheet is updated in the background; if it refuses, we undo.
+  var fd = null;
+  if (val === null) applyScore(name, e, null); else fd = dropFood(name, e, val);
   queueSave({ pin:teacher.pin, section:section, name:name, exam:exam, value:val,
     ok: function(){
       inp.removeAttribute('data-pending');
       inp.setAttribute('data-last', String(val));
-      st.textContent = '✓';
-      if (!DATA || DATA.section !== section) return;
-      var ei = DATA.exams.indexOf(exam); if (ei < 0) return;
-      if (val === null) applyScore(name, ei, null);
-      else dropFood(name, ei, val);
+      st.textContent = '✓'; st.title = 'Saved to the sheet';
     },
     fail: function(err){
       inp.removeAttribute('data-pending');
       st.textContent = '⚠'; st.title = errText(err);
       inp.value = cur === null ? '' : cur;
-      handleTeacherError(err);
+      if (DATA && DATA.section === section){
+        var ei = DATA.exams.indexOf(exam);
+        if (ei >= 0){ if (fd) cancelFood(fd, name, ei, cur); else applyScore(name, ei, cur); }
+      }
+      if (!isAuthErr(err)) toast('⚠ ' + name + '\'s score was not saved: ' + errText(err));
+      else handleTeacherError(err);
     }
   });
   return true;
@@ -1931,6 +2433,151 @@ function openSections(){
     });
 }
 
+/* ---------- 📥 Export this section's exam scores to Excel ----------
+   Built right here in the browser (no extra work for Apps Script), from freshly loaded data.
+   Scores only: the real scores as entered, perfect scores, totals and averages as live Excel formulas. */
+var excelLib = null;
+function loadExcelJS(){
+  if (window.ExcelJS) return Promise.resolve(window.ExcelJS);
+  if (excelLib) return excelLib;
+  var urls = ['https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js',
+              'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js'];
+  excelLib = new Promise(function(res, rej){
+    (function next(i){
+      if (i >= urls.length){ excelLib = null; rej(new Error('Could not load the Excel tool. Check the internet connection and try again.')); return; }
+      var sc = document.createElement('script');
+      sc.src = urls[i]; sc.async = true;
+      sc.onload = function(){ window.ExcelJS ? res(window.ExcelJS) : next(i + 1); };
+      sc.onerror = function(){ sc.remove(); next(i + 1); };
+      document.head.appendChild(sc);
+    })(0);
+  });
+  return excelLib;
+}
+function waitForSaves(ms){            // make sure scores still being saved are in the file
+  return new Promise(function(res){
+    var t0 = Date.now();
+    (function check(){ if ((!saving && !saveQ.length) || Date.now() - t0 > ms) res(); else setTimeout(check, 200); })();
+  });
+}
+function colName(n){ var s = ''; n++; while (n > 0){ var m = (n - 1) % 26; s = String.fromCharCode(65 + m) + s; n = Math.floor((n - 1)/26); } return s; }
+function safeFile(n){ return String(n).replace(/[\\\/:*?"<>|]+/g, '-').replace(/\s+/g, ' ').trim().slice(0, 80) || 'Class'; }
+
+$('xlsBtn').addEventListener('click', function(){
+  var btn = this;
+  if (btn.disabled) return;
+  btn.disabled = true; btn.textContent = '⏳ Preparing…';
+  var section = DATA.section;
+  var done = function(){ btn.disabled = false; btn.textContent = '📥 Excel'; };
+  waitForSaves(15000)
+    .then(function(){ return Promise.all([live ? api('getData', section, '') : Promise.resolve(null), loadExcelJS()]); })
+    .then(function(r){
+      if (r[0] && !r[0].unchanged && r[0].section === section) onData(r[0]);   // freshest scores from the sheet
+      return buildExcel(r[1], DATA);
+    })
+    .then(function(file){
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(file.blob); a.download = file.name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 60000);
+      toast('📥 Downloaded ' + file.name);
+      done();
+    })
+    .catch(function(e){ done(); if (isAuthErr(e)) handleTeacherError(e); else toast('⚠ Could not make the Excel file: ' + errText(e)); });
+});
+
+function buildExcel(ExcelJS, D){
+  var wb = new ExcelJS.Workbook();
+  wb.creator = 'Class Aquarium'; wb.created = new Date();
+  var ws = wb.addWorksheet('Scores', { views:[{ state:'frozen', xSplit:2, ySplit:5 }] });
+  var nE = D.exams.length, n = D.students.length;
+  var C0 = 3, cT = C0 + nE, cA = cT + 1;                       // first exam column, Total, Average %
+  var first = colName(C0 - 1), last = colName(C0 + nE - 2);     // letters of first/last exam column
+  var HEAD = 5, PERF = 6, R0 = 7, R1 = R0 + Math.max(n, 1) - 1;
+  var now = new Date();
+  var blue = { type:'pattern', pattern:'solid', fgColor:{ argb:'FFCFE8FF' } };
+  var pale = { type:'pattern', pattern:'solid', fgColor:{ argb:'FFEEF6FF' } };
+  var thin = { style:'thin', color:{ argb:'FFB8CCE0' } };
+  var box = { top:thin, left:thin, bottom:thin, right:thin };
+
+  ws.getCell('A1').value = D.section + ' — Exam scores';
+  ws.getCell('A1').font = { bold:true, size:16 };
+  ws.getCell('A2').value = (CFG.className || 'Class Aquarium') + ' · Exported ' + now.toLocaleString([], { dateStyle:'medium', timeStyle:'short' });
+  ws.getCell('A2').font = { italic:true, color:{ argb:'FF5A6B7D' } };
+  ws.getCell('A3').value = 'Blank = absent. Total and Average update automatically if you change a score.';
+  ws.getCell('A3').font = { size:9, color:{ argb:'FF5A6B7D' } };
+
+  var head = ['No.', 'Student'].concat(D.exams.map(function(x, e){ return x + (D.curve[e] ? ' (curved)' : ''); })).concat(['Total', 'Average %']);
+  ws.getRow(HEAD).values = head;
+  ws.getRow(HEAD).font = { bold:true };
+  ws.getRow(HEAD).alignment = { vertical:'middle', horizontal:'center', wrapText:true };
+  ws.getRow(HEAD).height = 30;
+  head.forEach(function(_, i){ var c = ws.getRow(HEAD).getCell(i + 1); c.fill = blue; c.border = box; });
+
+  var perfTotal = D.max.reduce(function(a, b){ return a + (Number(b) || 0); }, 0);
+  var pr = ws.getRow(PERF);
+  pr.getCell(2).value = 'Perfect score';
+  D.max.forEach(function(m, e){ pr.getCell(C0 + e).value = m; });
+  pr.getCell(cT).value = nE ? { formula:'SUM(' + first + PERF + ':' + last + PERF + ')', result:perfTotal } : 0;
+  pr.font = { italic:true, color:{ argb:'FF4A6A85' } };
+  for (var i = 1; i <= cA; i++){ pr.getCell(i).fill = pale; pr.getCell(i).border = box; pr.getCell(i).alignment = { horizontal: i === 2 ? 'left' : 'center' }; }
+
+  D.students.forEach(function(s, k){
+    var r = R0 + k, row = ws.getRow(r), total = 0, possible = 0;
+    row.getCell(1).value = k + 1;
+    row.getCell(2).value = s.name;                                    // always plain text, never a formula
+    s.scores.forEach(function(v, e){
+      var c = row.getCell(C0 + e);
+      if (v === null || v === undefined) return;                      // absent stays blank
+      c.value = v; total += v; possible += Number(D.max[e]) || 0;
+      if (v === 0) c.font = { color:{ argb:'FFD62839' }, bold:true };
+    });
+    var rng = first + r + ':' + last + r;
+    row.getCell(cT).value = nE ? { formula:'SUM(' + rng + ')', result:total } : 0;
+    row.getCell(cA).value = nE ? { formula:'IFERROR(SUM(' + rng + ')/SUMPRODUCT((' + rng + '<>"")*$' + first + '$' + PERF + ':$' + last + '$' + PERF + '),"")',
+      result: possible ? total/possible : '' } : '';
+    row.getCell(cT).font = { bold:true };
+    for (var i = 1; i <= cA; i++){
+      var c = row.getCell(i); c.border = box;
+      if (i !== 2) c.alignment = { horizontal:'center' };
+      if (k % 2) c.fill = { type:'pattern', pattern:'solid', fgColor:{ argb:'FFF7FAFD' } };
+    }
+  });
+  ws.getColumn(cA).numFmt = '0.0%';
+  ws.getColumn(1).width = 6; ws.getColumn(2).width = Math.min(40, Math.max(18, D.students.reduce(function(a, s){ return Math.max(a, s.name.length + 2); }, 0)));
+  for (var e = 0; e < nE; e++) ws.getColumn(C0 + e).width = Math.min(18, Math.max(9, String(head[e + 2]).length * .9));
+  ws.getColumn(cT).width = 10; ws.getColumn(cA).width = 12;
+  ws.pageSetup = { orientation: nE > 8 ? 'landscape' : 'portrait', fitToPage:true, fitToWidth:1, fitToHeight:0, printTitlesRow: HEAD + ':' + PERF };
+
+  // Summary: one row per exam
+  var sm = wb.addWorksheet('Summary', { views:[{ state:'frozen', ySplit:3 }] });
+  sm.getCell('A1').value = D.section + ' — Exam summary'; sm.getCell('A1').font = { bold:true, size:14 };
+  var sh = ['Exam', 'Perfect score', 'Curved', 'Class average', 'Average %', 'Highest', 'Lowest', 'Took the exam', 'Absent'];
+  sm.getRow(3).values = sh; sm.getRow(3).font = { bold:true };
+  sh.forEach(function(_, i){ var c = sm.getRow(3).getCell(i + 1); c.fill = blue; c.border = box; c.alignment = { horizontal:'center', wrapText:true }; });
+  D.exams.forEach(function(x, e){
+    var L = colName(C0 + e - 1), rng = 'Scores!' + L + R0 + ':' + L + R1, row = sm.getRow(4 + e);
+    var vals = D.students.map(function(s){ return s.scores[e]; }).filter(function(v){ return v !== null && v !== undefined; });
+    var avg = vals.length ? vals.reduce(function(a, b){ return a + b; }, 0)/vals.length : '';
+    row.values = [x, D.max[e], D.curve[e] ? 'Yes' : 'No',
+      { formula:'IFERROR(AVERAGE(' + rng + '),"")', result:avg },
+      { formula:'IFERROR(D' + (4 + e) + '/B' + (4 + e) + ',"")', result: avg === '' ? '' : avg/(D.max[e] || 100) },
+      { formula:'IF(COUNT(' + rng + ')=0,"",MAX(' + rng + '))', result: vals.length ? Math.max.apply(null, vals) : '' },
+      { formula:'IF(COUNT(' + rng + ')=0,"",MIN(' + rng + '))', result: vals.length ? Math.min.apply(null, vals) : '' },
+      { formula:'COUNT(' + rng + ')', result: vals.length },
+      { formula:'COUNTBLANK(' + rng + ')', result: n - vals.length }];
+    for (var i = 1; i <= 9; i++){ var c = row.getCell(i); c.border = box; if (i > 1) c.alignment = { horizontal:'center' }; }
+  });
+  sm.getColumn(1).width = 22; for (var i = 2; i <= 9; i++) sm.getColumn(i).width = 13;
+  sm.getColumn(4).numFmt = '0.0'; sm.getColumn(5).numFmt = '0.0%';
+
+  return wb.xlsx.writeBuffer().then(function(buf){
+    var d = now, ymd = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+    return { blob: new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+             name: safeFile(D.section) + ' - Scores - ' + ymd + '.xlsx' };
+  });
+}
+
 /* settings */
 $('setBtn').addEventListener('click', function(){
   openModal('<h3>⚙️ Settings</h3><p>These apply to all sections.</p>' +
@@ -1940,6 +2587,7 @@ $('setBtn').addEventListener('click', function(){
     '<div><label>"Excellent" line, full heal (%)</label><input type="number" id="sExc" min="2" max="100" value="' + CFG.excellentPercent + '"></div></div>' +
     '<p style="font-size:13px;margin-top:6px">A student with perfect scores becomes a Legend fish after about 70% of the planned exams.</p>' +
     '<label class="check"><input type="checkbox" id="sNick"' + (CFG.showFishNames ? ' checked' : '') + '> Label fish with their fish names instead of student names</label>' +
+    '<label class="check"><input type="checkbox" id="sSeason"' + (CFG.seasonal !== false ? ' checked' : '') + '> Seasonal decorations (Christmas, Buwan ng Wika, rainy season…)</label>' +
     '<div class="err" id="sErr"></div><div class="actions"><button id="sCancel">Cancel</button><button class="primary" id="sSave">Save</button></div>' +
     '<hr style="border:none;border-top:1px solid var(--line);margin:18px 0 6px">' +
     '<label>Change teacher PIN</label><div class="grid2"><input type="password" id="p1" placeholder="New PIN"><input type="password" id="p2" placeholder="Repeat new PIN"></div>' +
@@ -1951,7 +2599,7 @@ $('setBtn').addEventListener('click', function(){
         api('saveSettings', teacher.pin, DATA.section, {
           className: b.querySelector('#sTitle').value, expectedExams: b.querySelector('#sExp').value,
           illPercent: b.querySelector('#sPass').value, excellentPercent: b.querySelector('#sExc').value, refreshSeconds: CFG.refreshSeconds,
-          showFishNames: b.querySelector('#sNick').checked
+          showFishNames: b.querySelector('#sNick').checked, seasonal: b.querySelector('#sSeason').checked
         }).then(function(d){ closeModal(); onData(d); toast('Settings saved.'); })
           .catch(function(e){ if (/WRONG_PIN|NO_PIN/.test(String(e && e.message))) return handleTeacherError(e); b.querySelector('#sErr').textContent = errText(e); busy(save, false, 'Save'); });
       };
@@ -1997,6 +2645,10 @@ var MOCK = (function(){
   a.curve = a.exams.map(function(x){ return x === 'Long Test 1'; });        // demo: a hard, curved exam
   a.students.forEach(function(s){ if (s.scores[2] !== null) s.scores[2] = Math.round(s.scores[2]*.78); });
   b.curve = b.exams.map(function(){ return false; });
+  a.quests = [ { id:'q1', creature:'whale', goal:'pass', exam:'Long Test 2', target:25, at:0 },
+               { id:'q2', creature:'turtle', goal:'average', exam:'Quiz 4', target:70, at:0 },
+               { id:'q3', creature:'octopus', goal:'pass', exam:'Long Test 2', target:36, at:0 } ];
+  b.quests = [];
   var store = { pin:'1234', settings:{ className:'Class Aquarium', expectedExams:8, illPercent:50, excellentPercent:90, refreshSeconds:60, showFishNames:false },
     order:['Grade 7 – Sampaguita','Grade 7 – Rosal'], sections:{ 'Grade 7 – Sampaguita':a, 'Grade 7 – Rosal':b } };
   a.boosts = [
@@ -2013,7 +2665,7 @@ var MOCK = (function(){
   function sec(name){ var s = store.sections[name]; if (!s) throw new Error('Section not found.'); return s; }
   function getData(section){
     var n = store.sections[section] ? section : store.order[0], s = store.sections[n];
-    return { settings:store.settings, hasPin:true, sections:store.order.slice(), section:n, exams:s.exams, max:s.max, students:s.students, lastExam:0, boosts:s.boosts, curve:s.curve, serverNow:Date.now() };
+    return { settings:store.settings, hasPin:true, sections:store.order.slice(), section:n, exams:s.exams, max:s.max, students:s.students, lastExam:0, boosts:s.boosts, curve:s.curve, quests:s.quests, serverNow:Date.now() };
   }
   return {
     getData:getData,
@@ -2054,31 +2706,42 @@ var MOCK = (function(){
       chk(pin); var s = sec(section);
       if (!PERKS[perk]) throw new Error('Please choose a perk.');
       if (!s.students.some(function(x){ return x.name === name; })) throw new Error('Student not found. Try reloading.');
-      s.boosts.push({ id:'b' + Date.now() + Math.random(), student:name, perk:perk, points:Number(points) || 0,
-        reason:String(reason || '').slice(0, 120), exam: s.exams.indexOf(exam) >= 0 ? exam : '', date:new Date().toLocaleString(), at:Date.now() });
-      return getData(section);
+      var nb = { id:'b' + Date.now() + Math.random(), student:name, perk:perk, points:Number(points) || 0,
+        reason:String(reason || '').slice(0, 120), exam: s.exams.indexOf(exam) >= 0 ? exam : '', date:new Date().toLocaleString(), at:Date.now() };
+      s.boosts.push(nb);
+      return { boost:nb };
     },
     setCurve:function(pin, section, exam, on){
       chk(pin); var s = sec(section), e = s.exams.indexOf(exam);
       if (e < 0) throw new Error('Exam not found. Try reloading.');
       s.curve[e] = !!on; return getData(section);
     },
+    addQuest:function(pin, section, creature, goal, exam, target){
+      chk(pin); var s = sec(section);
+      if (!CREATURES[creature]) throw new Error('Please choose a sea creature.');
+      if (s.exams.indexOf(exam) < 0) throw new Error('Exam not found. Try reloading.');
+      var q = { id:'q' + Date.now() + Math.random(), creature:creature, goal:goal, exam:exam, target:Number(target), at:Date.now() };
+      s.quests.push(q); return { quest:q };
+    },
+    removeQuest:function(pin, section, id){
+      chk(pin); var s = sec(section); s.quests = s.quests.filter(function(q){ return q.id !== id; }); return true;
+    },
     removeBoost:function(pin, section, id){
       chk(pin); var s = sec(section);
       s.boosts = s.boosts.filter(function(x){ return x.id !== id; });
-      return getData(section);
+      return true;
     },
     addSection:function(pin, name){
       chk(pin); name = String(name).trim();
       if (!name) throw new Error('Please give the section a name.');
       if (store.sections[name]) throw new Error('There is already a section called "' + name + '".');
-      store.sections[name] = { exams:[], max:[], curve:[], students:[], boosts:[] }; store.order.push(name);
+      store.sections[name] = { exams:[], max:[], curve:[], students:[], boosts:[], quests:[] }; store.order.push(name);
       return getData(name);
     },
     saveSettings:function(pin, section, s){
       chk(pin);
       store.settings = { className:String(s.className || 'Class Aquarium'), expectedExams:Math.max(1, +s.expectedExams || 10),
-        illPercent:clamp(+s.illPercent || 50, 1, 99), excellentPercent:clamp(+s.excellentPercent || 90, 2, 100), refreshSeconds:60, showFishNames:!!s.showFishNames };
+        illPercent:clamp(+s.illPercent || 50, 1, 99), excellentPercent:clamp(+s.excellentPercent || 90, 2, 100), refreshSeconds:60, showFishNames:!!s.showFishNames, seasonal:s.seasonal !== false };
       return getData(section);
     },
     changePin:function(pin, np){ chk(pin); if (!/^\S{4,20}$/.test(np)) throw new Error('The PIN must be 4 to 20 characters with no spaces.'); store.pin = np; return true; }
@@ -2102,15 +2765,25 @@ if (setupProblem){
   });
 } else {
   currentSection = QP.get('section') || '';
-  if (remote) showMsg('🐠 Filling the tank…');
+  var snap = loadSnap(currentSection);
+  if (snap){ snap.fromSnap = true; delete snap.serverNow; onData(snap); }   // instant first view
+  else if (remote) showMsg('🐠 Filling the tank…');
   load();
 }
+/* Refresh: each screen waits a slightly different time, so 50 phones don't all ask at the same second.
+   Hidden tabs don't ask at all, and a tab coming back to the front refreshes right away. */
 (function tick(){
   setTimeout(function(){
     if (live && !playTimer && !teacher.on && document.visibilityState === 'visible') load();
     tick();
-  }, Math.max(15, CFG.refreshSeconds || 60)*1000);
+  }, Math.max(15, CFG.refreshSeconds || 60)*1000*(.8 + Math.random()*.4));
 })();
+var lastVis = Date.now();
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible'){
+    if (live && !teacher.on && Date.now() - lastVis > 15000) load();
+  } else lastVis = Date.now();
+});
 requestAnimationFrame(frame);
 })();
 </script>
